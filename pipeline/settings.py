@@ -7,10 +7,12 @@ class Settings(BaseSettings):
     # Environment detection
     ENVIRONMENT: str = "development"
     
+    
     # Core API Keys
     GROQ_API_KEY: str
     APP_SECRET_KEY: str
     MONGODB_URI: str
+    FRONTEND_URL: str 
 
     # Supabase Configuration
     SUPABASE_URL: str
