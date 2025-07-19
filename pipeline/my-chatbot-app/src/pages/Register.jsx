@@ -103,7 +103,7 @@ const Register = () => {
                         <label className="block font-semibold mb-1">Email</label>
                         <input
                             type="email"
-                            className="w-full border rounded p-2 text-base"
+                            className="w-full border rounded p-2 text-[16px] appearance-none bg-white"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             required
@@ -117,7 +117,7 @@ const Register = () => {
                     />
                     <button
                         type="submit"
-                        className="w-full bg-blue-700 text-white py-2 rounded-lg font-semibold hover:bg-blue-800 transition text-base focus:outline-none focus:ring-0 touch-manipulation select-none"
+                        className="w-full bg-blue-700 text-white py-2 rounded-lg font-semibold hover:bg-blue-800 transition text-[16px] appearance-none focus:outline-none focus:ring-0 touch-manipulation select-none"
                         disabled={loading}
                     >
                         {loading ? 'Registering...' : 'Sign up'}
