@@ -307,33 +307,44 @@ const Navbar = () => {
                     )}
                 </div>
             </div>
-            {/* Mobile menu (add onClick to close menu) */}
-            {mobileOpen && (
-                <div className="fixed inset-0 z-40 bg-black/40" onClick={() => setMobileOpen(false)}></div>
-            )}
+            {/* Mobile menu sliding overlay */}
             <AnimatePresence>
                 {mobileOpen && (
                     <motion.div
                         initial={{ x: '-100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '-100%' }}
-                        transition={{ duration: 0.2 }}
-                        className="fixed top-0 left-0 w-72 h-full bg-white !bg-white shadow-lg z-50 flex flex-col gap-6 p-6"
-                        style={{ backgroundColor: '#fff' }}
+                        transition={{ duration: 0.25 }}
+                        className="fixed inset-0 z-50 md:hidden bg-black/40"
+                        onClick={() => setMobileOpen(false)}
                     >
-                        <button className="self-end" onClick={() => setMobileOpen(false)}>
-                            <span className="text-2xl">&times;</span>
-                        </button>
-                        <Link to="/" className="text-lg font-semibold" onClick={() => setMobileOpen(false)}>Rent</Link>
-                        <Link to="/buy" className="text-lg font-semibold" onClick={() => setMobileOpen(false)}>Buy</Link>
-                        <Link to="/shortlet" className="text-lg font-semibold" onClick={() => setMobileOpen(false)}>Shortlet</Link>
-                        <Link to="/agents" className="text-lg font-semibold" onClick={() => setMobileOpen(false)}>Find an Agent</Link>
-                        <button
-                            className="w-full bg-blue-700 text-white py-2 rounded-lg font-semibold hover:bg-blue-800 transition text-base focus:outline-none focus:ring-0 touch-manipulation select-none"
-                            onClick={() => { setMobileOpen(false); navigate('/agent/register'); }}
+                        <motion.div
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{ duration: 0.25 }}
+                            className="absolute left-4 top-16 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex flex-col gap-2"
+                            onClick={e => e.stopPropagation()}
                         >
-                            Post Listing
-                        </button>
+                            <button className="self-end mb-2" onClick={() => setMobileOpen(false)}>
+                                <span className="text-2xl">&times;</span>
+                            </button>
+                            <Link to="/" className="px-3 py-2 rounded font-semibold text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition" onClick={() => setMobileOpen(false)}>Rent</Link>
+                            <Link to="/buy" className="px-3 py-2 rounded font-semibold text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition" onClick={() => setMobileOpen(false)}>Buy</Link>
+                            <Link to="/shortlet" className="px-3 py-2 rounded font-semibold text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition" onClick={() => setMobileOpen(false)}>Shortlet</Link>
+                            <Link to="/agents" className="px-3 py-2 rounded font-semibold text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition" onClick={() => setMobileOpen(false)}>Find an Agent</Link>
+                            {(session && session.user && currentUser) && (
+                                <Link to="/community" className="px-3 py-2 rounded font-semibold text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition" onClick={() => setMobileOpen(false)}>Community Insights</Link>
+                            )}
+                            {!isLoggedIn && (
+                                <button
+                                    className="px-3 py-2 rounded font-semibold text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition"
+                                    onClick={() => { setMobileOpen(false); navigate('/agent/register'); }}
+                                >
+                                    Post Listing
+                                </button>
+                            )}
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>

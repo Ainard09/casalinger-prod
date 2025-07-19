@@ -34,11 +34,6 @@ body {
   font-family: 'Urbanist', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
-html, body {
-  font-size: 16px;
-  -webkit-tap-highlight-color: transparent;
-}
-
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
