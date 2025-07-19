@@ -3784,15 +3784,12 @@ def to_supabase_url(path, bucket):
     base_url = settings.SUPABASE_PUBLIC_URL
     return f"{base_url}/{bucket}/{path}"
 
+app = create_app()
+
+# Start APScheduler job (runs in both dev and prod)
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=expire_promotions, trigger="interval", minutes=30)
+scheduler.start()
+
 if __name__ == '__main__':
-    # from waitress import serve
-    # serve(app, host="0.0.0.0", port=5000)
-
-    app = create_app()
-
-    # Start APScheduler job
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=expire_promotions, trigger="interval", minutes=30)
-    scheduler.start()
-
     app.run(debug=True)
