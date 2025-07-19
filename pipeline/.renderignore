@@ -1,0 +1,5 @@
+# .renderignore in pipeline/
+my-chatbot-app/
+node_modules/
+*.log
+.env
