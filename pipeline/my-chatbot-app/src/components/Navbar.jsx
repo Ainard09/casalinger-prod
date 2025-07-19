@@ -318,7 +318,8 @@ const Navbar = () => {
                         animate={{ x: 0 }}
                         exit={{ x: '-100%' }}
                         transition={{ duration: 0.2 }}
-                        className="fixed top-0 left-0 w-72 h-full bg-white shadow-lg z-50 flex flex-col gap-6 p-6"
+                        className="fixed top-0 left-0 w-72 h-full bg-white !bg-white shadow-lg z-50 flex flex-col gap-6 p-6"
+                        style={{ backgroundColor: '#fff' }}
                     >
                         <button className="self-end" onClick={() => setMobileOpen(false)}>
                             <span className="text-2xl">&times;</span>
