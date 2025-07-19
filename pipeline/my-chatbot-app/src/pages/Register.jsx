@@ -85,7 +85,7 @@ const Register = () => {
                 </div>
                 <button
                     onClick={handleGoogle}
-                    className="w-full flex items-center justify-center gap-2 bg-blue-50 text-gray-900 font-semibold py-3 rounded-lg mb-4 border border-gray-200 hover:bg-blue-100 transition"
+                    className="w-full flex items-center justify-center gap-2 bg-blue-50 text-gray-900 font-semibold py-3 rounded-lg mb-4 border border-gray-200 hover:bg-blue-100 transition text-base focus:outline-none focus:ring-0 touch-manipulation select-none"
                     disabled={loading}
                 >
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
@@ -103,7 +103,7 @@ const Register = () => {
                         <label className="block font-semibold mb-1">Email</label>
                         <input
                             type="email"
-                            className="w-full border rounded p-2"
+                            className="w-full border rounded p-2 text-base"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             required
@@ -117,7 +117,7 @@ const Register = () => {
                     />
                     <button
                         type="submit"
-                        className="w-full bg-blue-700 text-white py-2 rounded-lg font-semibold hover:bg-blue-800 transition"
+                        className="w-full bg-blue-700 text-white py-2 rounded-lg font-semibold hover:bg-blue-800 transition text-base focus:outline-none focus:ring-0 touch-manipulation select-none"
                         disabled={loading}
                     >
                         {loading ? 'Registering...' : 'Sign up'}
