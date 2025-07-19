@@ -83,18 +83,18 @@ def require_supabase_authenticated(f):
             return jsonify({'error': 'Invalid Supabase token', 'details': str(e)}), 401
         return f(*args, **kwargs)
     return decorated_function
-
+ƒ
 # Initialize Flask app
 def create_app():
     app = Flask(__name__)
-    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}})
+    CORS(app, supports_credentials=True, resources={r"/*": {"origins": settings.cors_origins}})
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
     app.config['SESSION_COOKIE_SECURE'] = True  # Set to True in production with HTTPS
     app.config['SESSION_COOKIE_HTTPONLY'] = True
-    app.config['SESSION_COOKIE_SAMESITE'] = None  # Allow cross-origin requests in development
+    app.config['SESSION_COOKIE_SAMESITE'] = "Lax"  # Allow cross-origin requests in development
     app.config['SESSION_COOKIE_DOMAIN'] = None  # Let Flask handle it
     app.secret_key = settings.APP_SECRET_KEY
   
@@ -133,7 +133,7 @@ def create_app():
    
 
     @app.route('/api/featured-properties')
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def api_featured_properties():
         # Try to get Supabase user ID from JWT
         auth_header = request.headers.get('Authorization', '')
@@ -453,7 +453,7 @@ def create_app():
         return inner()
 
     @app.route('/api/register', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def api_register():
         data = request.json
         name = data.get('name')
@@ -482,7 +482,7 @@ def create_app():
         return response
 
     @app.route('/api/login', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def api_login():
         data = request.json
         email = data.get('email')
@@ -788,7 +788,7 @@ def create_app():
     
 
     @app.route('/api/upload-reel', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def upload_reel():
         try:
             data = request.get_json()
@@ -816,8 +816,7 @@ def create_app():
             return jsonify({"error": "Internal Server Error"}), 500
         
     @app.route('/api/user-reels', methods=['GET'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
-    @cache_response(expiry=600, key_prefix="user_reels")  # Cache for 10 minutes
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)  # Cache for 10 minutes
     def get_user_reels():
         # Always use last 50 interactions from all users (not the current user)
         interactions = (
@@ -914,7 +913,7 @@ def create_app():
 
 
     @app.route('/api/listing/<int:listing_id>', methods=['PUT'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def update_listing(listing_id):
         listing = Listing.query.get_or_404(listing_id)
         # TODO: Add check to ensure the current_user (agent) owns this listing
@@ -1151,7 +1150,7 @@ def create_app():
             return jsonify({"success": True, "action": "saved"})
 
     @app.route('/api/interaction', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def save_interaction():
         data = request.json
         listing_id = data.get('listing_id')
@@ -1225,7 +1224,7 @@ def create_app():
 
 
     @app.route('/api/listing/<int:listing_id>')
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     @cache_response(expiry=300, key_prefix="listing_details")  # Cache for 5 minutes
     def get_listing_by_id(listing_id):
         listing = Listing.query.get_or_404(listing_id)
@@ -1543,7 +1542,7 @@ def create_app():
             return jsonify({"error": f"Failed to clear agent cache: {str(e)}"}), 500
     
     @app.route('/api/delete-reel', methods=['DELETE'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def delete_reel():
         data = request.get_json()
         reel_url = data.get('reel_url')
@@ -1565,7 +1564,7 @@ def create_app():
 
     
     @app.route('/api/test-session', methods=['GET'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def test_session():
         user_id = request.args.get('user_id', type=int)
         print(f"Test session - Request cookies: {dict(request.cookies)}")
@@ -1577,7 +1576,7 @@ def create_app():
         })
 
     @app.route('/api/set_session', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def set_session():
         data = request.get_json()
         user_id = data.get('user_id')
@@ -1681,7 +1680,7 @@ def create_app():
         return jsonify({'success': True, 'id': post.id})
 
     @app.route('/api/community/comment', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def add_comment():
         data = request.json
         user_id = data.get('user_id') or session.get('user_id')
@@ -1727,7 +1726,7 @@ def create_app():
         })
 
     @app.route('/api/community/comment/like', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def like_community_comment():
         data = request.json
         user_id = data.get('user_id') or session.get('user_id')
@@ -1755,7 +1754,7 @@ def create_app():
             return jsonify({'success': True, 'liked': True})
 
     @app.route('/api/community/like', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def like_community_post():
         data = request.json
         user_id = data.get('user_id') or session.get('user_id')
@@ -2586,7 +2585,7 @@ def create_app():
         return jsonify({'reels': reels})
 
     @app.route('/api/market/analytics')
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     @cache_response(expiry=600, key_prefix="market_analytics")  # Cache for 10 minutes
     def market_analytics():
         try:
@@ -2648,7 +2647,7 @@ def create_app():
             return jsonify({'error': 'Failed to fetch market analytics'}), 500
 
     @app.route('/api/listing/<int:listing_id>/promote', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def promote_listing(listing_id):
         try:
             listing = Listing.query.get_or_404(listing_id)
@@ -2678,7 +2677,7 @@ def create_app():
             return jsonify({"error": "Failed to promote listing."}), 500
 
     @app.route('/api/listing/<int:listing_id>/pause-promotion', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def pause_promotion(listing_id):
         try:
             listing = Listing.query.get_or_404(listing_id)
@@ -2715,7 +2714,7 @@ def create_app():
             return jsonify({"error": "Failed to pause promotion."}), 500
 
     @app.route('/api/listing/<int:listing_id>/resume-promotion', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def resume_promotion(listing_id):
         try:
             listing = Listing.query.get_or_404(listing_id)
@@ -2766,7 +2765,7 @@ def create_app():
 
     # Admin Authentication Endpoints
     @app.route('/api/admin/login', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def admin_login():
         # Always redirect admin login to Clerk UI
         return jsonify({
@@ -2774,7 +2773,7 @@ def create_app():
         }), 401
 
     @app.route('/api/admin/register', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def admin_register():
         # Check if this is the first admin (no admins exist)
         existing_admins = Admin.query.count()
@@ -2834,7 +2833,7 @@ def create_app():
         }), 201
 
     @app.route('/api/admin/logout', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def admin_logout():
         session.pop('admin_id', None)
         session.pop('admin_name', None)
@@ -2872,7 +2871,7 @@ def create_app():
 
     # Admin Property Management Endpoints
     @app.route('/api/admin/properties', methods=['GET'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     @require_supabase_authenticated
     def admin_get_properties():
         # Check if user is admin in our database
@@ -3048,7 +3047,7 @@ def create_app():
             return jsonify({'error': 'Failed to fetch properties'}), 500
 
     @app.route('/api/admin/property/<int:listing_id>/feature', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     @require_supabase_authenticated
     def admin_feature_property(listing_id):
         # Check if user is admin in our database
@@ -3079,7 +3078,7 @@ def create_app():
             return jsonify({'error': 'Failed to feature property'}), 500
 
     @app.route('/api/admin/property/<int:listing_id>/unfeature', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     @require_supabase_authenticated
     def admin_unfeature_property(listing_id):
         # Check if user is admin in our database
@@ -3110,7 +3109,7 @@ def create_app():
             return jsonify({'error': 'Failed to unfeature property'}), 500
 
     @app.route('/api/admin/property/<int:listing_id>/toggle-feature', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     @require_supabase_authenticated
     def admin_toggle_feature_property(listing_id):
         # Check if user is admin in our database
@@ -3143,7 +3142,7 @@ def create_app():
             return jsonify({'error': 'Failed to toggle feature status'}), 500
 
     @app.route('/api/admin/featured-properties', methods=['GET'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     @require_supabase_authenticated
     def admin_get_featured_properties():
         # Check if user is admin in our database
@@ -3197,7 +3196,7 @@ def create_app():
             return jsonify({'error': 'Failed to fetch featured properties'}), 500
 
     @app.route('/api/admin/agents', methods=['GET'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     @require_supabase_authenticated
     def admin_get_agents():
         # Check if user is admin in our database
@@ -3628,7 +3627,7 @@ def create_app():
         return jsonify({'success': True, 'message': 'Message sent to agent!'})
 
     @app.route('/api/check-user-exists', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def check_user_exists():
         data = request.json
         email = data.get('email')
@@ -3645,7 +3644,7 @@ def create_app():
             return jsonify({"exists": False, "message": "User does not exist"}), 200
 
     @app.route('/api/check-agent-exists', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def check_agent_exists():
         data = request.get_json()
         email = data.get('email')
@@ -3658,7 +3657,7 @@ def create_app():
             return jsonify({'exists': False}), 200
 
     @app.route('/api/listings', methods=['POST'])
-    @cross_origin(origins=["http://localhost:5173"], supports_credentials=True)
+    @cross_origin(origins=settings.cors_origins, supports_credentials=True)
     def create_listing():
         data = request.get_json()
         def safe_float(val, default=0.0):
@@ -3748,7 +3747,7 @@ def create_app():
                 except Exception as e:
                     print("Error parsing units JSON data", e)
 
-        new_property.url = f"http://localhost:5173/listing/{new_property.id}"
+        new_property.url = f"{settings.FRONTEND_URL}/listing/{new_property.id}"
         db.session.commit()
 
         # Invalidate caches so new listings show up immediately
