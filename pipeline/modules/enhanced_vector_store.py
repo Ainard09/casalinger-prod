@@ -17,7 +17,14 @@ except ImportError:
 
 from settings import settings
 
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+# Lazy load embedding model to reduce memory usage
+_embedding_model = None
+
+def get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        _embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+    return _embedding_model
 
 @dataclass
 class MemoryEntry:
@@ -80,7 +87,8 @@ class EnhancedVectorStore:
     def __init__(self, user_id: str) -> None:
         if not self._initialized:
             self._validate_env_vars()
-            self.model = embedding_model  # Use shared model
+            # Lazy load embedding model when needed
+            self._model = None
             self.client = QdrantClient(
                 url=settings.QDRANT_URL, 
                 api_key=settings.QDRANT_API_KEY
@@ -90,6 +98,13 @@ class EnhancedVectorStore:
         self.user_id = user_id
         self.collection_name = f"enhanced_memory_{user_id}"
         self._ensure_collection_exists()
+    
+    @property
+    def model(self):
+        """Lazy load embedding model when first accessed"""
+        if self._model is None:
+            self._model = get_embedding_model()
+        return self._model
 
     def _validate_env_vars(self) -> None:
         """Validate that all required environment variables are set."""

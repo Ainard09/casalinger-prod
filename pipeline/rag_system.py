@@ -20,22 +20,22 @@ import pymongo
 import certifi
 
 from settings import settings
-
-# Configure logging
-# logging.basicConfig(level=logging.INFO)
-# logger = logging.getLogger(__name__)
-
-# MongoDB setup for property_collection
 # MongoDB setup
 client = pymongo.MongoClient(settings.MONGODB_URI, tlsCAFile=certifi.where())
 db = client["CasaLinger"]
 property_collection = db["property_collection"]
 real_estate_info_collection = db["real_estate_info_collection"]
 
-# Embedding model
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
+# Lazy load embedding model to reduce memory usage
+_embedding_model = None
+
+def get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        _embedding_model = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+    return _embedding_model
 
 @dataclass
 class ContextQuality:
@@ -54,6 +54,7 @@ def get_embedding(text: str) -> list[float]:
     if not text.strip():
         print("Attempted to get embedding for empty text.")
         return []
+    embedding_model = get_embedding_model()
     return embedding_model.embed_query(text)
 
 def mongo_vector_search(user_query: str, collection, index_name: str, k: int = 4, full_docs: bool = False) -> List[Document]:

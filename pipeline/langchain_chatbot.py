@@ -45,7 +45,14 @@ from redis_helper import get_cached_memory_retrieval, find_similar_cached_memory
 # logger = logging.getLogger(__name__)
 
 
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+# Lazy load embedding model to reduce memory usage
+_embedding_model = None
+
+def get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        _embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    return _embedding_model
 
 # # Load property vector index (your database)
 # property_vectorstore = FAISS.load_local(
@@ -378,6 +385,7 @@ def vector_semantic_embedding(state: AgentState, config: RunnableConfig):
     CACHE_EXPIRY = 1800
 
     # 1. Compute embedding for the question
+    embedding_model = get_embedding_model()
     question_embedding = embedding_model.embed_query(question)
 
     # 2. Try semantic cache

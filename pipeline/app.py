@@ -16,7 +16,6 @@ import random
 import traceback
 from datetime import datetime, timedelta, timezone
 from recommender import Recommender
-from langchain_chatbot import langchain_bot
 from helpers import clear_user_memory
 from settings import settings
 import nest_asyncio
@@ -83,7 +82,7 @@ def require_supabase_authenticated(f):
             return jsonify({'error': 'Invalid Supabase token', 'details': str(e)}), 401
         return f(*args, **kwargs)
     return decorated_function
-ƒ
+
 # Initialize Flask app
 def create_app():
     app = Flask(__name__)
@@ -1512,6 +1511,8 @@ def create_app():
             return jsonify({"error": "No query provided"}), 400
 
         try:
+            # Lazy import to prevent memory issues on startup
+            from langchain_chatbot import langchain_bot
             response = langchain_bot(user_query, user_id)
             return jsonify({"response": response.strip()})
         except Exception as e:

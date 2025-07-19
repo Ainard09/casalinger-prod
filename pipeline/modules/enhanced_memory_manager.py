@@ -18,7 +18,14 @@ from modules.enhanced_vector_store import EnhancedVectorStore, EnhancedMemory, M
 from settings import settings
 from sentence_transformers import SentenceTransformer
 
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+# Lazy load embedding model to reduce memory usage
+_embedding_model = None
+
+def get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        _embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+    return _embedding_model
 
 @dataclass
 class MemoryEntry:
@@ -47,7 +54,8 @@ class EnhancedMemoryManager:
     
     def __init__(self, user_id: str):
         self.user_id = user_id
-        self.embedding_model = embedding_model
+        # Lazy load embedding model when needed
+        self._embedding_model = None
         self.vector_store = EnhancedVectorStore(user_id)
         self.llm = ChatGroq(
             model=settings.SMALL_TEXT_MODEL_NAME,
@@ -59,6 +67,13 @@ class EnhancedMemoryManager:
         # Memory consolidation settings
         self.consolidation_threshold = getattr(settings, 'MEMORY_CONSOLIDATION_THRESHOLD', 10)
         self.memory_cache = {}  # In-memory cache for frequently accessed memories
+    
+    @property
+    def embedding_model(self):
+        """Lazy load embedding model when first accessed"""
+        if self._embedding_model is None:
+            self._embedding_model = get_embedding_model()
+        return self._embedding_model
         
     def extract_and_store_memories(self, message: BaseMessage) -> None:
         """Enhanced memory extraction with type classification"""
