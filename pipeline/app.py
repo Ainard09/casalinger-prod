@@ -1500,27 +1500,27 @@ def create_app():
         })
 
     #Temporarily disabled to reduce memory usage
-    @app.route('/ask_ai', methods=['POST'])
-    def ask_ai():
-        data = request.get_json()
-        user_id = data.get("user_id")
-        user_query = data.get("query")
+    # @app.route('/ask_ai', methods=['POST'])
+    # def ask_ai():
+    #     data = request.get_json()
+    #     user_id = data.get("user_id")
+    #     user_query = data.get("query")
 
-        if not user_id:
-            return jsonify({"error": "User ID is required"}), 401
-        if not user_query:
-            return jsonify({"error": "No query provided"}), 400
+    #     if not user_id:
+    #         return jsonify({"error": "User ID is required"}), 401
+    #     if not user_query:
+    #         return jsonify({"error": "No query provided"}), 400
 
-        try:
-            # Lazy import to prevent memory issues on startup
-            from langchain_chatbot import langchain_bot
-            response = langchain_bot(user_query, user_id)
-            return jsonify({"response": response.strip()})
-        except Exception as e:
-            # Log the full error for debugging
-            print("Error in /ask_ai:", traceback.format_exc())
-            # Return a generic error to the user
-            return jsonify({"error": "Sorry, something went wrong. Please try again later."}), 500
+    #     try:
+    #         # Lazy import to prevent memory issues on startup
+    #         from langchain_chatbot import langchain_bot
+    #         response = langchain_bot(user_query, user_id)
+    #         return jsonify({"response": response.strip()})
+    #     except Exception as e:
+    #         # Log the full error for debugging
+    #         print("Error in /ask_ai:", traceback.format_exc())
+    #         # Return a generic error to the user
+    #         return jsonify({"error": "Sorry, something went wrong. Please try again later."}), 500
 
     @app.route('/api/cache/stats', methods=['GET'])
     def cache_stats():
