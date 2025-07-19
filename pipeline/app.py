@@ -3791,5 +3791,5 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(func=expire_promotions, trigger="interval", minutes=30)
 scheduler.start()
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
