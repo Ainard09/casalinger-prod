@@ -1435,10 +1435,9 @@ def create_app():
                 "units": units_data
             })
 
-        # Recommended listings
+        # Recommended listings (now ORM-based)
+        recommender = Recommender(user_id=user_id)
         interactions = Interaction.query.filter_by(user_id=user_id).all()
-        recommender = Recommender(user_id=user_id, data=filepath)
-
         if not interactions:
             recommended = recommender.rank_based()
         else:
@@ -1494,7 +1493,26 @@ def create_app():
             "recommendations": formatted_recs
         })
 
-    #
+    # @app.route('/ask_ai', methods=['POST'])
+    # def ask_ai():
+    #     data = request.get_json()
+    #     user_id = data.get("user_id")
+    #     user_query = data.get("query")
+
+    #     if not user_id:
+    #         return jsonify({"error": "User ID is required"}), 401
+    #     if not user_query:
+    #         return jsonify({"error": "No query provided"}), 400
+
+    #     try:
+    #         response = langchain_bot(user_query, user_id)
+    #         return jsonify({"response": response.strip()})
+    #     except Exception as e:
+    #         # Log the full error for debugging
+    #         print("Error in /ask_ai:", traceback.format_exc())
+    #         # Return a generic error to the user
+    #         return jsonify({"error": "Sorry, something went wrong. Please try again later."}), 500
+
     @app.route('/api/cache/stats', methods=['GET'])
     def cache_stats():
         """Get Redis cache statistics for monitoring"""
