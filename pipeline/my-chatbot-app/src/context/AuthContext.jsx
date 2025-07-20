@@ -14,7 +14,9 @@ export const AuthProvider = ({ children }) => {
         // On mount, check Supabase session (v2+)
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (session && session.user) {
+            console.log('AuthContext session on mount:', session);
+            // Only restore user if session is valid and not expired
+            if (session && session.user && (!session.expires_at || session.expires_at * 1000 > Date.now())) {
                 const token = session.access_token;
                 let userData = null;
                 // Try agent profile first
