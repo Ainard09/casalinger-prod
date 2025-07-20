@@ -251,9 +251,19 @@ const AgentDashboard = () => {
 
     const handlePausePromotion = async (listingId) => {
         try {
+            // Get Supabase access token from localStorage
+            let token = null;
+            const sbKey = Object.keys(localStorage).find(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
+            if (sbKey) {
+                const sbSession = JSON.parse(localStorage.getItem(sbKey));
+                token = sbSession?.access_token;
+            }
             const res = await fetch(API_ENDPOINTS.PAUSE_PROMOTION(listingId), {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` }),
+                },
             });
             const data = await res.json();
             if (res.ok) {
