@@ -131,7 +131,7 @@ const Community = () => {
   const [editCategories, setEditCategories] = useState([]);
 
   const fetchPosts = () => {
-    const url = `${API_ENDPOINTS.COMMUNITY}${currentUser ? `?user_id=${currentUser.id}` : ''}`;
+    const url = `${API_ENDPOINTS.COMMUNITY_POSTS}${currentUser ? `?user_id=${currentUser.id}` : ''}`;
     fetch(url)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch community posts');
