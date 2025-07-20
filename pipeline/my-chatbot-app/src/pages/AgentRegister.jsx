@@ -8,6 +8,7 @@ const AgentRegister = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
@@ -17,6 +18,11 @@ const AgentRegister = () => {
         setError('');
         setLoading(true);
         setMessage('');
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            setLoading(false);
+            return;
+        }
         try {
             // Check if agent already exists
             const checkResponse = await fetch(API_ENDPOINTS.CHECK_AGENT_EXISTS, {
@@ -113,6 +119,13 @@ const AgentRegister = () => {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         autoComplete="new-password"
+                    />
+                    <PasswordInput
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        autoComplete="new-password"
+                        label="Confirm Password"
+                        placeholder="Confirm Password"
                     />
                     <button
                         type="submit"

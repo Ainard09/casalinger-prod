@@ -8,6 +8,7 @@ const Register = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
@@ -21,6 +22,11 @@ const Register = () => {
         setError('');
         setLoading(true);
         setMessage('');
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            setLoading(false);
+            return;
+        }
         try {
             // First check if user already exists in our database
             const checkResponse = await fetch(API_ENDPOINTS.CHECK_USER_EXISTS, {
@@ -115,6 +121,13 @@ const Register = () => {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         autoComplete="new-password"
+                    />
+                    <PasswordInput
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        autoComplete="new-password"
+                        label="Confirm Password"
+                        placeholder="Confirm Password"
                     />
                     <button
                         type="submit"
