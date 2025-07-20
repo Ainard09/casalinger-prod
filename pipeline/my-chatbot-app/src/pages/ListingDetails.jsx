@@ -348,8 +348,8 @@ const ListingDetails = () => {
     };
 
     // Toggle floorplan visibility
-    const toggleFloorplan = (fpName) => {
-        setExpandedFloorplans(prev => ({ ...prev, [fpName]: !prev[fpName] }));
+    const toggleFloorplan = (fpId) => {
+        setExpandedFloorplans(prev => ({ ...prev, [fpId]: !prev[fpId] }));
     };
 
     const formatAgentType = (agentType) => {
@@ -663,21 +663,22 @@ const ListingDetails = () => {
                                                         {floorplansInGroup.map(fp => (
                                                             <div key={fp.id} className="border border-gray-200 rounded-lg">
                                                                 {/* Floorplan Summary Row */}
-                                                                <div className="grid grid-cols-5 gap-4 p-4 items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm sm:text-base flex-wrap">
+                                                                <div
+                                                                    className="grid grid-cols-5 gap-4 p-4 items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm sm:text-base flex-wrap"
+                                                                    onClick={() => fp.child_units.length > 0 && toggleFloorplan(fp.id)}
+                                                                >
                                                                     <div className="font-semibold text-blue-600 dark:text-blue-400 text-base sm:text-lg">{fp.name}</div>
                                                                     <div className="text-gray-700 dark:text-gray-200 text-xs sm:text-sm">{fp.bedrooms}bd / {fp.bathrooms}ba</div>
                                                                     <div className="text-gray-700 dark:text-gray-200 text-xs sm:text-sm">{fp.sqft && fp.sqft > 0 ? `${fp.sqft} sqft` : ''}</div>
                                                                     <div className="text-gray-900 dark:text-gray-100 font-bold text-sm sm:text-base">₦{fp.price_min.toLocaleString()}</div>
                                                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
                                                                         <span className="text-green-700 dark:text-green-400 text-xs sm:text-sm">{fp.is_available ? 'Available Now' : 'Unavailable'}</span>
-                                                                        {fp.child_units.length > 0 && (
-                                                                            expandedFloorplans[fp.name] ? <ChevronUp /> : <ChevronDown />
-                                                                        )}
+                                                                        {expandedFloorplans[fp.id] ? <ChevronUp /> : <ChevronDown />}
                                                                     </div>
                                                                 </div>
 
                                                                 {/* Expanded Individual Units */}
-                                                                {expandedFloorplans[fp.name] && fp.child_units.length > 0 && (
+                                                                {expandedFloorplans[fp.id] && fp.child_units.length > 0 && (
                                                                     <div className="border-t bg-gray-50/50">
                                                                         {fp.child_units.map(unit => (
                                                                             <div key={unit.id} className="grid grid-cols-5 gap-4 p-4 items-center border-b last:border-b-0 text-gray-800 dark:text-gray-100 text-xs sm:text-sm flex-wrap">

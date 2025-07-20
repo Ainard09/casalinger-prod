@@ -12,6 +12,35 @@ const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }
     const [randomTag, setRandomTag] = useState(null); // ✅ Random tag state
     const images = property.image_paths.slice(0, 3);
 
+    // Touch swipe state
+    const [touchStartX, setTouchStartX] = useState(null);
+    const [touchEndX, setTouchEndX] = useState(null);
+
+    const minSwipeDistance = 40; // Minimum px distance for swipe
+
+    const onTouchStart = (e) => {
+        setTouchEndX(null); // Reset previous
+        setTouchStartX(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => {
+        setTouchEndX(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = (e) => {
+        if (!touchStartX || touchEndX === null) return;
+        const distance = touchStartX - touchEndX;
+        if (Math.abs(distance) > minSwipeDistance) {
+            if (distance > 0) {
+                // Swiped left
+                setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+            } else {
+                // Swiped right
+                setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+            }
+        }
+    };
+
     // Helper function to calculate price range for complex listings
     const getPriceDisplay = () => {
         const period = property.rent_period || 'month';
@@ -150,7 +179,11 @@ const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }
         <div
             className={`group bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-500 ease-in-out ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} hover:shadow-2xl hover:-translate-y-1`}
         >
-            <Link to={`/listing/${property.id}`} className="block relative w-full h-56 overflow-hidden cursor-pointer touch-manipulation">
+            <Link to={`/listing/${property.id}`} className="block relative w-full h-56 overflow-hidden cursor-pointer touch-manipulation"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+            >
                 {images.length > 0 && (
                     <img
                         src={images[currentImageIndex]}

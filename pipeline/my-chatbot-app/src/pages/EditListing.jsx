@@ -283,7 +283,7 @@ const EditListing = () => {
             await axios.put(API_ENDPOINTS.UPDATE_LISTING(listingId), payload, {
                 headers: { 'Content-Type': 'application/json' },
             });
-            navigate('/agent-dashboard');
+            navigate('/agent/dashboard');
         } catch (error) {
             console.error('Error updating listing:', error);
             setError('Failed to update listing. Please try again.');
