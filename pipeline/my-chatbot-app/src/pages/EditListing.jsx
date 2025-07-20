@@ -50,7 +50,7 @@ const EditListing = () => {
     useEffect(() => {
         const fetchListingData = async () => {
             try {
-                const { data } = await axios.get(API_ENDPOINTS.GET_LISTING(listingId));
+                const { data } = await axios.get(API_ENDPOINTS.LISTING_DETAILS(listingId));
                 setForm({
                     title: data.title || '',
                     description: data.description || '',
