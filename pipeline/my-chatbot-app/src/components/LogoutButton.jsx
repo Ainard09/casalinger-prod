@@ -9,6 +9,12 @@ const LogoutButton = () => {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
+        // Failsafe: Remove all Supabase auth tokens from localStorage
+        Object.keys(localStorage).forEach((key) => {
+            if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+                localStorage.removeItem(key);
+            }
+        });
         setCurrentUser(null); // This clears currentUser and localStorage
         localStorage.removeItem('currentUser');
         if (currentUser && currentUser.is_agent) {
