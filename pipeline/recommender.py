@@ -1,62 +1,76 @@
-from helpers import *
-from supabase_models import Listing
-import numpy as np
-import pandas as pd
+from supabase_models import Listing, Interaction, User
+from sqlalchemy import func, desc
 from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+import numpy as np
 
 
-class Recommender():
-    def __init__(self, user_id, data, rec_num=5) -> None:
+class Recommender:
+    def __init__(self, user_id, rec_num=5):
         self.user_id = user_id
         self.rec_num = rec_num
-        self.data = load_datasets(data)
-        self.listing_data = load_listing_data(data)
-        self.user_item_mat = create_user_item_matrix(self.data)
 
     def rank_based(self):
-        top_listing_ids = get_top_listing_ids(self.rec_num, self.data)
-        # Fetch the listings from the database
-        top_listings = Listing.query.filter(Listing.id.in_(top_listing_ids)).all()
+        # Get top listings by number of interactions (views + saves)
+        top_listing_ids = (
+            Interaction.query
+            .with_entities(Interaction.listing_id, func.count(Interaction.id).label('num_interactions'))
+            .group_by(Interaction.listing_id)
+            .order_by(desc('num_interactions'))
+            .limit(self.rec_num)
+            .all()
+        )
+        listing_ids = [row.listing_id for row in top_listing_ids]
+        top_listings = Listing.query.filter(Listing.id.in_(listing_ids)).all()
         return top_listings
 
     def user_rec(self):
-        """
-        Generate personalized recommendations based on saved listings' area and city.
-        
-        Returns:
-        - A list of recommended listing objects.
-        """
+        # Get the user's saved listings
+        saved_interactions = Interaction.query.filter_by(user_id=self.user_id, interaction_type="saved").all()
+        saved_listing_ids = [i.listing_id for i in saved_interactions]
+        if not saved_listing_ids:
+            return self.rank_based()
+
+        # Get the areas and cities of the user's saved listings
+        saved_listings = Listing.query.filter(Listing.id.in_(saved_listing_ids)).all()
+        saved_areas = set(l.area for l in saved_listings if l.area)
+        saved_cities = set(l.city for l in saved_listings if l.city)
+
+        # Find other users who have saved listings in the same areas/cities
+        similar_user_ids = (
+            Interaction.query
+            .with_entities(Interaction.user_id)
+            .filter(Interaction.listing_id.in_(saved_listing_ids), Interaction.user_id != self.user_id)
+            .distinct()
+            .all()
+        )
+        similar_user_ids = [row.user_id for row in similar_user_ids]
+
+        # Get listings saved by similar users, prioritize by area/city
         recs = []
-
-        # Get the user's saved listing IDs and their associated areas/cities
-        saved_listings = get_user_listings(self.user_id, self.user_item_mat)
-        saved_areas = self.listing_data[self.listing_data['id'].isin(saved_listings)]['area'].unique()
-        saved_cities = self.listing_data[self.listing_data['id'].isin(saved_listings)]['city'].unique()
-
-        # Get the neighbors (similar users)
-        neighbors_df = get_top_sorted_users(self.user_id, self.data, self.user_item_mat)
-
-        for neighbor in neighbors_df['neighbor_id']:
-            neighbor_listings = get_top_sorted_lists(neighbor, self.data, self.user_item_mat)
-
-            # Prioritize by area and city
-            for listing_id in neighbor_listings:
-                listing = self.listing_data[self.listing_data['id'] == listing_id].iloc[0]
-                if listing_id not in saved_listings:  # Exclude already saved listings
-                    if listing['area'] in saved_areas:
-                        recs.append(listing_id)
-                    elif listing['city'] in saved_cities and listing['area'] not in saved_areas:
-                        recs.append(listing_id)
-                    else:
-                        recs.append(listing_id)
-                    if len(recs) >= self.rec_num:
-                        break
-            if len(recs) >= self.rec_num:
-                break
-
-        # Fetch listings from the database
+        if similar_user_ids:
+            similar_interactions = (
+                Interaction.query
+                .filter(Interaction.user_id.in_(similar_user_ids), Interaction.interaction_type == "saved")
+                .all()
+            )
+            for interaction in similar_interactions:
+                listing = Listing.query.get(interaction.listing_id)
+                if not listing or listing.id in saved_listing_ids or listing.id in recs:
+                    continue
+                if listing.area in saved_areas:
+                    recs.append(listing.id)
+                elif listing.city in saved_cities:
+                    recs.append(listing.id)
+                else:
+                    recs.append(listing.id)
+                if len(recs) >= self.rec_num:
+                    break
+        # Fallback to rank-based if not enough recs
+        if len(recs) < self.rec_num:
+            more = [l.id for l in self.rank_based() if l.id not in recs and l.id not in saved_listing_ids]
+            recs.extend(more[:self.rec_num - len(recs)])
         recommended_listings = Listing.query.filter(Listing.id.in_(recs[:self.rec_num])).all()
-
         return recommended_listings
 
 
