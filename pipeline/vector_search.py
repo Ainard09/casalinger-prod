@@ -77,16 +77,23 @@ url_dict = {
 }
 
 
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
+# Lazy load embedding model to reduce memory usage
+_embedding_model = None
+
+def get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        _embedding_model = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+    return _embedding_model
 
 
 def get_embedding(text: str) -> list[float]:
         if not text.strip():
             print("Attempted to get embedding for empty text.")
             return []
-        embedding = embedding_model.embed_query(text)
+        embedding = get_embedding_model().embed_query(text)
         return embedding
 
 

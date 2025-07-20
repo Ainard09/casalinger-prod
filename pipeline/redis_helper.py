@@ -14,7 +14,15 @@ from redis_config import get_redis_config, is_redis_cloud_configured
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# Lazy load embedding model to reduce memory usage
+_model = None
+
+def get_embedding_model():
+    global _model
+    if _model is None:
+        _model = SentenceTransformer('all-MiniLM-L6-v2')
+    return _model
 
 # Initialize Redis client
 try:
@@ -497,8 +505,7 @@ def get_cached_memory_retrieval(user_id, context):
 
 def find_similar_cached_memory_by_content(user_id, context, similarity_threshold=0.7):
     """
-    Find similar cached memory retrieval results by comparing current question 
-    with the actual memory content (not just the cached questions)
+    Find similar cached memory retrieval results by comparing with memory content.
     
     Args:
         user_id (str): User ID
@@ -520,7 +527,7 @@ def find_similar_cached_memory_by_content(user_id, context, similarity_threshold
             return None
         
         # Encode the current context
-        current_embedding = model.encode(context.lower().strip())
+        current_embedding = get_embedding_model().encode(context.lower().strip())
         
         best_match = None
         best_similarity = 0
@@ -559,7 +566,7 @@ def find_similar_cached_memory_by_content(user_id, context, similarity_threshold
                     for memory_content in all_memory_content:
                         if memory_content:
                             # Encode memory content and calculate similarity
-                            memory_embedding = model.encode(memory_content.lower().strip())
+                            memory_embedding = get_embedding_model().encode(memory_content.lower().strip())
                             similarity = cosine_similarity(current_embedding.tolist(), memory_embedding.tolist())
                             
                             if similarity > best_similarity and similarity >= similarity_threshold:
@@ -611,7 +618,7 @@ def find_similar_cached_memory(user_id, context, similarity_threshold=0.8):
             return None
         
         # Encode the current context
-        current_embedding = model.encode(context.lower().strip())
+        current_embedding = get_embedding_model().encode(context.lower().strip())
         
         best_match = None
         best_similarity = 0
@@ -627,7 +634,7 @@ def find_similar_cached_memory(user_id, context, similarity_threshold=0.8):
                     # TIER 1: Compare with cached questions
                     if cached_user_question:
                         # Encode cached user question and calculate similarity
-                        cached_embedding = model.encode(cached_user_question.lower().strip())
+                        cached_embedding = get_embedding_model().encode(cached_user_question.lower().strip())
                         similarity = cosine_similarity(current_embedding.tolist(), cached_embedding.tolist())
                         
                         if similarity > best_similarity and similarity >= similarity_threshold:
@@ -674,7 +681,7 @@ def find_similar_cached_memory(user_id, context, similarity_threshold=0.8):
                         for memory_content in all_memory_content:
                             if memory_content:
                                 # Encode memory content and calculate similarity
-                                memory_embedding = model.encode(memory_content.lower().strip())
+                                memory_embedding = get_embedding_model().encode(memory_content.lower().strip())
                                 similarity = cosine_similarity(current_embedding.tolist(), memory_embedding.tolist())
                                 
                                 if similarity > best_similarity and similarity >= similarity_threshold:
