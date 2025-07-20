@@ -13,10 +13,11 @@ const PrivateRoute = ({ children }) => {
     useEffect(() => {
         if (!currentUser) {
             // Check Supabase session
-            const session = supabase.auth.session();
-            if (session && session.user) {
-                // Fetch user profile from backend
-                const fetchProfile = async () => {
+            const fetchSessionAndProfile = async () => {
+                const { data: sessionData } = await supabase.auth.getSession();
+                const session = sessionData?.session;
+                if (session && session.user) {
+                    // Fetch user profile from backend
                     const token = session.access_token;
                     let userData = null;
                     // Try agent profile first
@@ -53,12 +54,12 @@ const PrivateRoute = ({ children }) => {
                         setIsAuthed(false);
                     }
                     setChecking(false);
-                };
-                fetchProfile();
-            } else {
-                setIsAuthed(false);
-                setChecking(false);
-            }
+                } else {
+                    setIsAuthed(false);
+                    setChecking(false);
+                }
+            };
+            fetchSessionAndProfile();
         } else {
             setIsAuthed(true);
             setChecking(false);
