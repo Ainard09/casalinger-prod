@@ -99,7 +99,7 @@ const AdminDashboard = () => {
             const session = sessionData?.session;
             const token = session?.access_token;
             const endpoint = currentStatus ? 'unfeature' : 'feature';
-            const res = await fetch(API_ENDPOINTS.ADMIN_PROPERTY_ACTION(propertyId, endpoint), {
+            const res = await fetch(API_ENDPOINTS.ADMIN_PROPERTY_FEATURE(propertyId, endpoint), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

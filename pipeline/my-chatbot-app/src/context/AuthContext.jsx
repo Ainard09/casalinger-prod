@@ -24,7 +24,10 @@ export const AuthProvider = ({ children }) => {
                 if (res.ok) {
                     userData = await res.json();
                     userData.is_agent = true;
-                } else {
+                } else if (res.status !== 404) {
+                    console.error('Error fetching agent profile:', res.status);
+                }
+                if (!userData) {
                     // Try user profile
                     res = await fetch(API_ENDPOINTS.USER_PROFILE, {
                         headers: { 'Authorization': `Bearer ${token}` }
@@ -32,15 +35,20 @@ export const AuthProvider = ({ children }) => {
                     if (res.ok) {
                         userData = await res.json();
                         userData.is_user = true;
-                    } else {
-                        // Try admin profile
-                        res = await fetch(API_ENDPOINTS.ADMIN_PROFILE, {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        if (res.ok) {
-                            userData = await res.json();
-                            userData.is_admin = true;
-                        }
+                    } else if (res.status !== 404) {
+                        console.error('Error fetching user profile:', res.status);
+                    }
+                }
+                if (!userData) {
+                    // Try admin profile
+                    res = await fetch(API_ENDPOINTS.ADMIN_PROFILE, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        userData = await res.json();
+                        userData.is_admin = true;
+                    } else if (res.status !== 404) {
+                        console.error('Error fetching admin profile:', res.status);
                     }
                 }
                 if (userData) {
