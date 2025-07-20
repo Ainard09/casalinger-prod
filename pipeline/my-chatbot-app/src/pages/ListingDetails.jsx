@@ -15,6 +15,7 @@ import Footer from '../components/Footer';
 import ApplicationModal from '../components/ApplicationModal';
 import ViewingModal from '../components/ViewingModal';
 import ListingGallery from './ListingGallery';
+import { API_BASE_URL, API_ENDPOINTS } from '../utils/config';
 
 const TABS = [
   { label: 'Description', key: 'description' },
@@ -186,7 +187,7 @@ const ListingDetails = () => {
     useEffect(() => {
         const fetchListing = async () => {
             try {
-                const url = `http://127.0.0.1:5000/api/listing/${id}${currentUser?.id ? `?user_id=${currentUser.id}` : ''}`;
+                const url = `${API_ENDPOINTS.LISTING_DETAILS(id)}${currentUser?.id ? `?user_id=${currentUser.id}` : ''}`;
                 const res = await fetch(url);
                 if (!res.ok) throw new Error('Failed to fetch listing');
                 const data = await res.json();
@@ -194,7 +195,7 @@ const ListingDetails = () => {
                 setIsFavorite(data.is_favorite);
                 if (!hasLoggedView.current && currentUser && !currentUser.is_agent) {
                     hasLoggedView.current = true;
-                    fetch('http://127.0.0.1:5000/api/interaction', {
+                    fetch(API_ENDPOINTS.INTERACTION, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -238,7 +239,7 @@ const ListingDetails = () => {
         const prev = isFavorite;
         setIsFavorite(!isFavorite); // Optimistic UI update
         try {
-            await fetch('http://127.0.0.1:5000/api/interaction', {
+            await fetch(API_ENDPOINTS.INTERACTION, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -250,11 +251,11 @@ const ListingDetails = () => {
                     state: listing.state,
                     area: listing.area,
                     tags: Array.isArray(listing.tags) ? listing.tags.join(',') : ''
-                }),
+                })
             });
         } catch (err) {
-            setIsFavorite(prev); // Revert UI
-            setError('Failed to update save state');
+            setIsFavorite(prev); // Revert on error
+            alert('Failed to update favorite status.');
         }
     };
 
@@ -314,7 +315,7 @@ const ListingDetails = () => {
             return;
         }
         try {
-            const res = await fetch('http://127.0.0.1:5000/api/send-message', {
+            const res = await fetch(API_ENDPOINTS.SEND_MESSAGE, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

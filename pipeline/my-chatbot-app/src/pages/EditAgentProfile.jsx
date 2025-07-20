@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiCamera } from 'react-icons/fi';
 import { supabase } from '../utils/supabaseClient';
+import { API_BASE_URL, API_ENDPOINTS } from '../utils/config';
 
 const EditAgentProfile = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -28,7 +29,7 @@ const EditAgentProfile = () => {
         const fetchAgent = async () => {
             if (!currentUser?.id) return;
             try {
-                const res = await fetch(`http://127.0.0.1:5000/api/agent/profile/update?agent_id=${currentUser.id}`);
+                const res = await fetch(`${API_ENDPOINTS.AGENT_PROFILE_UPDATE}?agent_id=${currentUser.id}`);
                 if (res.ok) {
                     const data = await res.json();
                     let street = '', city = '', state = '';
@@ -120,7 +121,7 @@ const EditAgentProfile = () => {
             photo_url: uploadedPhotoUrl
         };
         try {
-            const res = await fetch('http://127.0.0.1:5000/api/agent/profile/update', {
+            const res = await fetch(API_ENDPOINTS.AGENT_PROFILE_UPDATE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

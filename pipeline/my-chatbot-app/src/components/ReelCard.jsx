@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, Video, Heart, Share, Volume2, VolumeX, Trash2, Expand } from 'lucide-react';
 import { Button } from "../ui/Button";
 import axios from 'axios';
+import { API_BASE_URL, API_ENDPOINTS } from '../utils/config';
 
 function ReelCard({
     title,
@@ -119,7 +120,7 @@ function ReelCard({
     const handleViewDetails = async (e) => {
         e.preventDefault();
         try {
-            await fetch('http://127.0.0.1:5000/api/interaction', {
+            await fetch(API_ENDPOINTS.INTERACTION, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

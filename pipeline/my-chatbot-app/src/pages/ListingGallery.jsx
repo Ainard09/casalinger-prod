@@ -5,6 +5,7 @@ import { MapPin, Video, BadgeCheck, PawPrint, ChevronLeft, ChevronRight } from '
 import { AuthContext } from '../context/AuthContext';
 import ApplicationModal from '../components/ApplicationModal';
 import ViewingModal from '../components/ViewingModal';
+import { API_BASE_URL, API_ENDPOINTS } from '../utils/config';
 
 const ListingGallery = ({ listing: propListing, isModal = false, onClose }) => {
     const { id } = useParams();
@@ -31,7 +32,7 @@ const ListingGallery = ({ listing: propListing, isModal = false, onClose }) => {
 
         const fetchListing = async () => {
             try {
-                const res = await fetch(`http://127.0.0.1:5000/api/listing/${id}`);
+                const res = await fetch(API_ENDPOINTS.LISTING_DETAILS(id));
                 if (!res.ok) throw new Error('Failed to fetch listing');
                 const data = await res.json();
                 setListing(data);

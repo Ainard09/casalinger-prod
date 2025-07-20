@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { supabase } from '../utils/supabaseClient';
+import { API_BASE_URL, API_ENDPOINTS } from '../utils/config';
 
 const PrivateRoute = ({ children }) => {
     const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -19,7 +20,7 @@ const PrivateRoute = ({ children }) => {
                     const token = session.access_token;
                     let userData = null;
                     // Try agent profile first
-                    let res = await fetch('http://127.0.0.1:5000/api/agent/profile', {
+                    let res = await fetch(API_ENDPOINTS.AGENT_PROFILE, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (res.ok) {
@@ -27,7 +28,7 @@ const PrivateRoute = ({ children }) => {
                         userData.is_agent = true;
                     } else {
                         // Try user profile
-                        res = await fetch('http://127.0.0.1:5000/api/user/profile', {
+                        res = await fetch(API_ENDPOINTS.USER_PROFILE, {
                             headers: { 'Authorization': `Bearer ${token}` }
                         });
                         if (res.ok) {
@@ -35,7 +36,7 @@ const PrivateRoute = ({ children }) => {
                             userData.is_user = true;
                         } else {
                             // Try admin profile
-                            res = await fetch('http://127.0.0.1:5000/api/admin/profile', {
+                            res = await fetch(API_ENDPOINTS.ADMIN_PROFILE, {
                                 headers: { 'Authorization': `Bearer ${token}` }
                             });
                             if (res.ok) {
