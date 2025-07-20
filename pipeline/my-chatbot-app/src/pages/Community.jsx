@@ -255,21 +255,33 @@ const Community = () => {
         credentials: 'include',
         body: JSON.stringify({
           post_id: postId,
-          content: content,
-          user_id: currentUser?.id,
-          parent_comment_id: parentCommentId
+          content,
+          parent_comment_id: parentCommentId,
+          user_id: currentUser?.id
         })
       });
   
       const data = await res.json();
-      if (data.success) {
-        fetchPosts();
-        setCommentText(prev => ({ ...prev, [postId]: '' }));
-      } else {
-        console.error("⚠️ Comment not saved:", data.error);
+      if (res.ok && data.comment) {
+        // Update the post in local state to include the new comment
+        setPosts(posts => posts.map(post =>
+          post.id === postId
+            ? {
+                ...post,
+                replies: parentCommentId
+                  ? post.replies.map(reply =>
+                      reply.id === parentCommentId
+                        ? { ...reply, replies: [...(reply.replies || []), data.comment] }
+                        : reply
+                    )
+                  : [...(post.replies || []), data.comment],
+                comments: post.comments + 1
+              }
+            : post
+        ));
       }
     } catch (err) {
-      console.error("❌ Failed to comment:", err);
+      console.error("❌ Failed to post comment:", err);
     }
   };
 
