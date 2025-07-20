@@ -685,7 +685,7 @@ const ListingDetails = () => {
                                                                                 <div className="pl-8 font-semibold text-blue-600 dark:text-blue-400">{unit.name}</div>
                                                                                 <div className="text-gray-700 dark:text-gray-200">{unit.bedrooms}bd / {unit.bathrooms}ba</div>
                                                                                 <div className="text-gray-700 dark:text-gray-200">{unit.sqft && unit.sqft > 0 ? `${unit.sqft} sqft` : ''}</div>
-                                                                                <div className="text-gray-900 dark:text-gray-100 font-bold">₦{unit.price_min.toLocaleString()}{rentPeriodAbbr}</div>
+                                                                                <div className="text-gray-900 dark:text-gray-100 font-bold">₦{unit.price_min.toLocaleString()}</div>
                                                                                 <div className="text-green-700 dark:text-green-400">{unit.is_available ? 'Available Now' : 'Unavailable'}</div>
                                                                             </div>
                                                                         ))}
