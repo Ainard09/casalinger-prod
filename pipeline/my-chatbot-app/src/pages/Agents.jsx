@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AgentCard from '../components/AgentCard';
 import AgentFilters from '../components/AgentFilters';
-import { API_ENDPOINTS } from '../utils/config';
+import { API_BASE_URL } from '../utils/config';
 
 const FindAgentPage = () => {
   const [agents, setAgents] = useState([]);
@@ -13,17 +13,23 @@ const FindAgentPage = () => {
   const [agentTypeInput, setAgentTypeInput] = useState('');
 
   useEffect(() => {
-    fetch(API_ENDPOINTS.ADMIN_AGENTS)
+    fetch(API_BASE_URL + '/api/agents')
       .then((res) => res.json())
       .then((data) => {
-        setAgents(data);
+        if (Array.isArray(data)) {
+          setAgents(data);
+        } else if (Array.isArray(data.agents)) {
+          setAgents(data.agents);
+        } else {
+          setAgents([]);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
   // Filtering logic (uses input state directly)
-  const filteredAgents = agents.filter(agent => {
+  const filteredAgents = Array.isArray(agents) ? agents.filter(agent => {
     const matchesLocation = locationInput === '' || (
       (agent.address && agent.address.toLowerCase().includes(locationInput.toLowerCase())) ||
       (agent.state && agent.state.toLowerCase().includes(locationInput.toLowerCase())) ||
@@ -33,7 +39,7 @@ const FindAgentPage = () => {
     const matchesName = nameInput === '' || (agent.name && agent.name.toLowerCase().includes(nameInput.toLowerCase()));
     const matchesType = agentTypeInput === '' || (agent.agent_type && agent.agent_type.toLowerCase() === agentTypeInput.toLowerCase());
     return matchesLocation && matchesName && matchesType;
-  });
+  }) : [];
 
   // Handler for Reset button
   const handleReset = () => {

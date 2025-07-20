@@ -67,10 +67,17 @@ function ReelCard({
     };
     // Fullscreen logic
     const handleFullscreen = () => {
-        if (videoRef.current && videoRef.current.requestFullscreen) {
-            videoRef.current.requestFullscreen();
-            setIsFullscreen(true);
-            videoRef.current.play();
+        if (videoRef.current) {
+            // iOS Safari
+            if (videoRef.current.webkitEnterFullscreen) {
+                videoRef.current.webkitEnterFullscreen();
+            } 
+            // Standard Fullscreen API
+            else if (videoRef.current.requestFullscreen) {
+                videoRef.current.requestFullscreen();
+                setIsFullscreen(true);
+                videoRef.current.play();
+            }
         }
     };
     // Exit fullscreen event and toggle class
