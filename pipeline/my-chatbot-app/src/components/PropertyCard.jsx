@@ -3,11 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../utils/config';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
 const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }) => {
     const { currentUser } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    // Remove custom image index state and handlers
+    // const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [loaded, setLoaded] = useState(false);
     const [randomTag, setRandomTag] = useState(null); // ✅ Random tag state
     const images = property.image_paths.slice(0, 3);
@@ -33,10 +36,10 @@ const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }
         if (Math.abs(distance) > minSwipeDistance) {
             if (distance > 0) {
                 // Swiped left
-                setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                // setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
             } else {
                 // Swiped right
-                setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                // setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
             }
         }
     };
@@ -101,17 +104,18 @@ const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }
         }
     };
 
-    const handlePrev = (e) => {
-        e.preventDefault(); // Prevent default link behavior
-        e.stopPropagation(); // Prevent navigation to listing details
-        setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-    };
+    // Remove custom image index state and handlers
+    // const handlePrev = (e) => {
+    //     e.preventDefault(); // Prevent default link behavior
+    //     e.stopPropagation(); // Prevent navigation to listing details
+    //     setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    // };
 
-    const handleNext = (e) => {
-        e.preventDefault(); // Prevent default link behavior
-        e.stopPropagation(); // Prevent navigation to listing details
-        setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    };
+    // const handleNext = (e) => {
+    //     e.preventDefault(); // Prevent default link behavior
+    //     e.stopPropagation(); // Prevent navigation to listing details
+    //     setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    // };
 
     const handleSave = (e) => {
         e.preventDefault(); // Prevent default button behavior
@@ -179,17 +183,24 @@ const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }
         <div
             className={`group bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-500 ease-in-out ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} hover:shadow-2xl hover:-translate-y-1`}
         >
-            <Link to={`/listing/${property.id}`} className="block relative w-full h-56 overflow-hidden cursor-pointer touch-manipulation"
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
-            >
+            <Link to={`/listing/${property.id}`} className="block relative w-full h-56 overflow-hidden cursor-pointer touch-manipulation">
                 {images.length > 0 && (
-                    <img
-                        src={images[currentImageIndex]}
-                        alt={property.title}
-                        className="w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-                    />
+                    <Swiper
+                        spaceBetween={10}
+                        slidesPerView={1}
+                        pagination={{ clickable: true }}
+                        style={{ width: '100%', height: '100%' }}
+                    >
+                        {images.map((img, idx) => (
+                            <SwiperSlide key={idx}>
+                                <img
+                                    src={img}
+                                    alt={property.title}
+                                    className="w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                                />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
                 )}
                 {/* Badge */}
                 <div className="absolute top-3 left-3 flex gap-2 z-10">
@@ -230,13 +241,13 @@ const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }
                 {images.length > 1 && (
                     <>
                         <button
-                            onClick={handlePrev}
+                            // onClick={handlePrev}
                             className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 md:p-1.5 rounded-full shadow hover:scale-110 active:scale-95 transition z-10 opacity-0 group-hover:opacity-100 touch-manipulation pointer-events-auto"
                         >
                             <ChevronLeft className="w-5 h-5 text-gray-800" />
                         </button>
                         <button
-                            onClick={handleNext}
+                            // onClick={handleNext}
                             className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 md:p-1.5 rounded-full shadow hover:scale-110 active:scale-95 transition z-10 opacity-0 group-hover:opacity-100 touch-manipulation pointer-events-auto"
                         >
                             <ChevronRight className="w-5 h-5 text-gray-800" />
@@ -266,7 +277,7 @@ const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }
                         {images.map((_, index) => (
                             <span
                                 key={index}
-                                className={`w-2.5 h-2.5 rounded-full ${currentImageIndex === index ? 'bg-white' : 'border border-white bg-white/40'}`}
+                                className={`w-2.5 h-2.5 rounded-full ${/* currentImageIndex === index ? 'bg-white' : */ 'border border-white bg-white/40'}`}
                             />
                         ))}
                     </div>
