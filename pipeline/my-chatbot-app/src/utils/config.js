@@ -1,6 +1,15 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const API_BASE_URL = rawApiUrl.replace(/\/$/, ''); // Remove trailing slash
 const IS_PRODUCTION = import.meta.env.MODE === 'production';
+
+// Debug logging
+console.log('🔧 Environment Variables:', {
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  MODE: import.meta.env.MODE,
+  API_BASE_URL: API_BASE_URL,
+  IS_PRODUCTION: IS_PRODUCTION
+});
 
 // Supabase Configuration
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
