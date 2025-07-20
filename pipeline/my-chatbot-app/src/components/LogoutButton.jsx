@@ -1,12 +1,14 @@
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../utils/supabaseClient';
 
 const LogoutButton = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
         setCurrentUser(null); // This clears currentUser and localStorage
         localStorage.removeItem('currentUser');
         if (currentUser && currentUser.is_agent) {
