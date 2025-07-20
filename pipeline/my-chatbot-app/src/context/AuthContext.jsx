@@ -15,13 +15,35 @@ export const AuthProvider = ({ children }) => {
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session && session.user) {
-                // Fetch user profile from backend
                 const token = session.access_token;
-                const res = await fetch(API_ENDPOINTS.USER_PROFILE, {
+                let userData = null;
+                // Try agent profile first
+                let res = await fetch(API_ENDPOINTS.AGENT_PROFILE, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
-                    const userData = await res.json();
+                    userData = await res.json();
+                    userData.is_agent = true;
+                } else {
+                    // Try user profile
+                    res = await fetch(API_ENDPOINTS.USER_PROFILE, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        userData = await res.json();
+                        userData.is_user = true;
+                    } else {
+                        // Try admin profile
+                        res = await fetch(API_ENDPOINTS.ADMIN_PROFILE, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (res.ok) {
+                            userData = await res.json();
+                            userData.is_admin = true;
+                        }
+                    }
+                }
+                if (userData) {
                     setCurrentUser(userData);
                     localStorage.setItem('currentUser', JSON.stringify(userData));
                 } else {
