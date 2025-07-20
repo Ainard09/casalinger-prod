@@ -133,12 +133,18 @@ const Community = () => {
   const fetchPosts = () => {
     const url = `${API_ENDPOINTS.COMMUNITY}${currentUser ? `?user_id=${currentUser.id}` : ''}`;
     fetch(url)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch community posts');
+        return res.json();
+      })
       .then(data => {
         setAllPosts(data.posts);
         setPosts(data.posts);
       })
-      .catch(err => console.error("❌ Failed to load community posts:", err));
+      .catch(err => {
+        console.error("❌ Failed to load community posts:", err);
+        // Optionally show a user-friendly error message
+      });
   };
   
   // Fetch posts from backend on mount
