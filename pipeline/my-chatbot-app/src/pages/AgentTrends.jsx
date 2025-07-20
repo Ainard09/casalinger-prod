@@ -6,6 +6,7 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 import { saveAs } from 'file-saver';
+import { API_ENDPOINTS } from '../utils/config';
 
 const COLORS = {
     light: ['#60A5FA', '#34D399', '#FBBF24', '#F87171', '#A78BFA'],
@@ -48,7 +49,7 @@ const AgentTrends = () => {
     const fetchTrends = async () => {
         try {
             const res = await fetch(
-                `http://127.0.0.1:5000/api/agent/${currentUser.id}/trends`
+                API_ENDPOINTS.AGENT_TRENDS(currentUser.id)
             );
             
             if (!res.ok) throw new Error('Failed to fetch trends data');

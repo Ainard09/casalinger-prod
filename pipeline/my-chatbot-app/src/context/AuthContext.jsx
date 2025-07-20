@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { API_ENDPOINTS } from '../utils/config';
 
 export const AuthContext = createContext();
 
@@ -16,7 +17,7 @@ export const AuthProvider = ({ children }) => {
             if (session && session.user) {
                 // Fetch user profile from backend
                 const token = session.access_token;
-                const res = await fetch('http://127.0.0.1:5000/api/user/profile', {
+                const res = await fetch(API_ENDPOINTS.USER_PROFILE, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {

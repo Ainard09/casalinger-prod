@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { AuthContext } from '../context/AuthContext';
+import { API_ENDPOINTS } from '../utils/config';
 
 export default function UserOnboarding() {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function UserOnboarding() {
             }
             // Check if user already completed onboarding
             const token = session.access_token;
-            const res = await fetch('http://127.0.0.1:5000/api/user/profile', {
+            const res = await fetch(API_ENDPOINTS.USER_PROFILE, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -43,7 +44,7 @@ export default function UserOnboarding() {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             const token = session?.access_token;
-            const response = await fetch('http://127.0.0.1:5000/api/user/onboarding', {
+            const response = await fetch(API_ENDPOINTS.USER_ONBOARDING, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -53,7 +54,7 @@ export default function UserOnboarding() {
             });
             if (response.ok) {
                 // Mark onboarding as complete in backend
-                const profileRes = await fetch('http://127.0.0.1:5000/api/user/profile', {
+                const profileRes = await fetch(API_ENDPOINTS.USER_PROFILE, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (profileRes.ok) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AgentCard from '../components/AgentCard';
 import AgentFilters from '../components/AgentFilters';
+import { API_ENDPOINTS } from '../utils/config';
 
 const FindAgentPage = () => {
   const [agents, setAgents] = useState([]);
@@ -12,7 +13,7 @@ const FindAgentPage = () => {
   const [agentTypeInput, setAgentTypeInput] = useState('');
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/agents')
+    fetch(API_ENDPOINTS.ADMIN_AGENTS)
       .then((res) => res.json())
       .then((data) => {
         setAgents(data);

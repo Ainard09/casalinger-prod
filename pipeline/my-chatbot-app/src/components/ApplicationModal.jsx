@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { calculatePriceRange } from '../utils/priceUtils';
+import { API_ENDPOINTS } from '../utils/config';
 
 const ApplicationModal = ({ isOpen, onClose, listing, onSuccess }) => {
   const { currentUser } = useContext(AuthContext);
@@ -32,7 +33,7 @@ const ApplicationModal = ({ isOpen, onClose, listing, onSuccess }) => {
     setError('');
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/property-applications', {
+      const response = await fetch(API_ENDPOINTS.PROPERTY_APPLICATIONS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

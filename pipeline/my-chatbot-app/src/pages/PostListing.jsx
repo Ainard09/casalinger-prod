@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { FiUpload, FiTag, FiImage, FiVideo, FiHome, FiPlus, FiTrash2, FiEdit, FiChevronDown, FiChevronUp, FiCopy, FiMapPin, FiClock } from 'react-icons/fi';
 import { supabase } from '../utils/supabaseClient';
-import { API_BASE_URL } from '../utils/config';
+import { API_ENDPOINTS } from '../utils/config';
 
 const TAG_OPTIONS = [
     "Luxury", "Modern", "Coastal", "Security", "Garden", "Ocean View", "Duplex", "Stable Light",
@@ -216,7 +216,7 @@ const PostListing = () => {
         }
 
         try {
-            const res = await fetch(`${API_BASE_URL}/api/listings`, {
+            const res = await fetch(API_ENDPOINTS.CREATE_LISTING, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

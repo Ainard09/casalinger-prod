@@ -7,6 +7,7 @@ import BookingDetailModal from '../components/BookingDetailModal';
 import { FiUpload, FiHome, FiEye, FiVideo, FiUser, FiFileText, FiCalendar, FiCheck, FiX, FiClock, FiEye as FiView, FiTrendingUp } from 'react-icons/fi';
 import { supabase } from '../utils/supabaseClient';
 import Footer from '../components/Footer';
+import { API_ENDPOINTS } from '../utils/config';
 
 const AgentDashboard = () => {
     const { currentUser } = useContext(AuthContext);
@@ -40,7 +41,7 @@ const AgentDashboard = () => {
                 const token = session?.access_token;
                 if (!token) return;
                 // Fetch agent profile
-                const res = await fetch('http://127.0.0.1:5000/api/agent/profile', {
+                const res = await fetch(API_ENDPOINTS.AGENT_PROFILE, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -48,7 +49,7 @@ const AgentDashboard = () => {
                     setAgent(agentData);
                 }
                 // Fetch listings
-                const listingsRes = await fetch(`http://127.0.0.1:5000/api/agent/${currentUser.id}/listings`, {
+                const listingsRes = await fetch(API_ENDPOINTS.AGENT_LISTINGS(currentUser.id), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (listingsRes.ok) {
@@ -57,7 +58,7 @@ const AgentDashboard = () => {
                 }
                 setLoading(false);
                 // Fetch applications
-                const appsRes = await fetch(`http://127.0.0.1:5000/api/agent/${currentUser.id}/applications`, {
+                const appsRes = await fetch(API_ENDPOINTS.AGENT_APPLICATIONS(currentUser.id), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (appsRes.ok) {
@@ -68,7 +69,7 @@ const AgentDashboard = () => {
                 }
                 setApplicationsLoading(false);
                 // Fetch bookings
-                const bookingsRes = await fetch(`http://127.0.0.1:5000/api/agent/${currentUser.id}/bookings`, {
+                const bookingsRes = await fetch(API_ENDPOINTS.AGENT_BOOKINGS(currentUser.id), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (bookingsRes.ok) {
@@ -121,7 +122,7 @@ const AgentDashboard = () => {
             const session = sessionData?.session;
             const token = session?.access_token;
 
-            const res = await fetch('http://127.0.0.1:5000/api/upload-reel', {
+            const res = await fetch(API_ENDPOINTS.UPLOAD_REEL, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -176,7 +177,7 @@ const AgentDashboard = () => {
             const session = sessionData?.session;
             const token = session?.access_token;
 
-            const res = await fetch('http://127.0.0.1:5000/api/delete-reel', {
+            const res = await fetch(API_ENDPOINTS.DELETE_REEL, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -222,7 +223,7 @@ const AgentDashboard = () => {
             const promotedUntil = new Date();
             promotedUntil.setDate(promotedUntil.getDate() + days);
             
-            const res = await fetch(`http://127.0.0.1:5000/api/listing/${listingId}/promote`, {
+            const res = await fetch(API_ENDPOINTS.PROMOTE_LISTING(listingId), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -250,7 +251,7 @@ const AgentDashboard = () => {
 
     const handlePausePromotion = async (listingId) => {
         try {
-            const res = await fetch(`http://127.0.0.1:5000/api/listing/${listingId}/pause-promotion`, {
+            const res = await fetch(API_ENDPOINTS.PAUSE_PROMOTION(listingId), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -276,7 +277,7 @@ const AgentDashboard = () => {
 
     const handleResumePromotion = async (listingId) => {
         try {
-            const res = await fetch(`http://127.0.0.1:5000/api/listing/${listingId}/resume-promotion`, {
+            const res = await fetch(API_ENDPOINTS.RESUME_PROMOTION(listingId), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -311,7 +312,7 @@ const AgentDashboard = () => {
 
     const handleUpdateApplicationStatus = async (applicationId, newStatus) => {
         try {
-            const res = await fetch(`http://127.0.0.1:5000/api/agent/application/${applicationId}/status`, {
+            const res = await fetch(API_ENDPOINTS.UPDATE_APPLICATION_STATUS(applicationId), {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
@@ -334,7 +335,7 @@ const AgentDashboard = () => {
 
     const handleUpdateBookingStatus = async (bookingId, newStatus) => {
         try {
-            const res = await fetch(`http://127.0.0.1:5000/api/agent/booking/${bookingId}/status`, {
+            const res = await fetch(API_ENDPOINTS.UPDATE_BOOKING_STATUS(bookingId), {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })

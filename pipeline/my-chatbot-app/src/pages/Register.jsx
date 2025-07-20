@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import PasswordInput from '../components/PasswordInput';
+import { API_ENDPOINTS } from '../utils/config';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Register = () => {
         setMessage('');
         try {
             // First check if user already exists in our database
-            const checkResponse = await fetch('http://127.0.0.1:5000/api/check-user-exists', {
+            const checkResponse = await fetch(API_ENDPOINTS.CHECK_USER_EXISTS, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -42,7 +43,7 @@ const Register = () => {
                 email,
                 password,
                 options: {
-                    emailRedirectTo: 'http://localhost:5173/user/onboarding'
+                    emailRedirectTo: `${window.location.origin}/user/onboarding`
                 }
             });
             if (error) {

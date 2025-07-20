@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { AuthContext } from '../context/AuthContext';
 import PasswordInput from '../components/PasswordInput';
+import { API_ENDPOINTS } from '../utils/config';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Login = () => {
             const { data: sessionData } = await supabase.auth.getSession();
             const session = sessionData?.session;
             const token = session?.access_token;
-            const res = await fetch('http://127.0.0.1:5000/api/user/profile', {
+            const res = await fetch(API_ENDPOINTS.USER_PROFILE, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {

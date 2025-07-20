@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Activity, Database, Clock, TrendingUp, TrendingDown } from 'lucide-react';
+import { API_ENDPOINTS } from '../utils/config';
 
 const CacheStats = () => {
     const [stats, setStats] = useState(null);
@@ -10,7 +11,7 @@ const CacheStats = () => {
     const fetchStats = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('http://127.0.0.1:5000/api/cache/stats');
+            const response = await axios.get(API_ENDPOINTS.CACHE_STATS);
             setStats(response.data);
             setError(null);
         } catch (err) {
@@ -23,7 +24,7 @@ const CacheStats = () => {
 
     const clearCache = async () => {
         try {
-            await axios.post('http://127.0.0.1:5000/api/cache/clear');
+            await axios.post(API_ENDPOINTS.CACHE_CLEAR);
             fetchStats(); // Refresh stats after clearing
         } catch (err) {
             setError('Failed to clear cache');

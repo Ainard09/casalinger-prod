@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { calculatePriceRange } from '../utils/priceUtils';
+import { API_ENDPOINTS } from '../utils/config';
 
 const ViewingModal = ({ isOpen, onClose, listing, onSuccess }) => {
   const { currentUser } = useContext(AuthContext);
@@ -38,7 +39,7 @@ const ViewingModal = ({ isOpen, onClose, listing, onSuccess }) => {
     setError('');
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/viewing-bookings', {
+      const response = await fetch(API_ENDPOINTS.VIEWING_BOOKINGS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import { MessageCircle, X, Trash2, Send, Bot, User } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { API_ENDPOINTS } from '../utils/config';
 
 const Chatbox = () => {
     const { currentUser } = useContext(AuthContext);
@@ -60,7 +61,7 @@ const Chatbox = () => {
             .map(m => ({ role: m.sender, content: m.text }));
 
         try {
-            const res = await fetch('http://127.0.0.1:5000/ask_ai', {
+            const res = await fetch(API_ENDPOINTS.ASK_AI, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

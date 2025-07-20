@@ -6,6 +6,7 @@ import { UserCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import { supabase } from '../utils/supabaseClient';
 import Footer from '../components/Footer';
+import { API_ENDPOINTS } from '../utils/config';
 
 const Dashboard = () => {
     const { currentUser } = useContext(AuthContext);
@@ -31,7 +32,7 @@ const Dashboard = () => {
                 const session = sessionData?.session;
                 const token = session?.access_token;
                 if (!token) return;
-                const res = await fetch('http://127.0.0.1:5000/api/user/profile', {
+                const res = await fetch(API_ENDPOINTS.USER_PROFILE, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -39,7 +40,7 @@ const Dashboard = () => {
                     setUserInfo(userData);
                 }
                 // Fetch dashboard data (saved properties, recommendations)
-                const dashRes = await fetch(`http://127.0.0.1:5000/api/user/${currentUser.id}/dashboard`, {
+                const dashRes = await fetch(API_ENDPOINTS.USER_DASHBOARD(currentUser.id), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (dashRes.ok) {
@@ -55,7 +56,7 @@ const Dashboard = () => {
     }, [currentUser]);
 
     const handleUnsave = (listingId) => {
-        fetch('http://127.0.0.1:5000/api/interaction', {
+        fetch(API_ENDPOINTS.INTERACTION, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit } from 'react-icons/fi';
 import { supabase } from '../utils/supabaseClient';
+import { API_ENDPOINTS } from '../utils/config';
 
 const AgentProfile = () => {
     const { currentUser } = useContext(AuthContext);
@@ -17,7 +18,7 @@ const AgentProfile = () => {
             if (!token) return;
             setLoading(true);
             try {
-                const res = await fetch('http://127.0.0.1:5000/api/agent/profile', {
+                const res = await fetch(API_ENDPOINTS.AGENT_PROFILE, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {

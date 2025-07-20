@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { AuthContext } from '../context/AuthContext';
 import PasswordInput from '../components/PasswordInput';
+import { API_ENDPOINTS } from '../utils/config';
 
 export default function AdminLogin() {
   const { setCurrentUser } = useContext(AuthContext);
@@ -28,7 +29,7 @@ export default function AdminLogin() {
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData?.session;
       const token = session?.access_token;
-      const res = await fetch('http://127.0.0.1:5000/api/admin/profile', {
+      const res = await fetch(API_ENDPOINTS.ADMIN_PROFILE, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {

@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { API_ENDPOINTS } from '../utils/config';
 
 const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }) => {
     const { currentUser } = useContext(AuthContext);
@@ -100,7 +101,7 @@ const PropertyCard = ({ property, savedListings, toggleSave, hideHeart = false }
         const isCurrentlySaved = savedListings.includes(property.id);
         toggleSave(property.id);
     
-        fetch('http://127.0.0.1:5000/api/interaction', {
+        fetch(API_ENDPOINTS.INTERACTION, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

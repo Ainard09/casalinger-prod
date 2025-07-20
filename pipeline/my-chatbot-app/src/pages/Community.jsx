@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { Button } from '../ui/Button';
 import { MessageCircle, Heart, Share2, Search, PlusCircle, CornerDownRight, ChevronsDown } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
+import { API_ENDPOINTS } from '../utils/config';
 
 const formatRelativeTime = (isoString) => {
     const now = new Date();
@@ -130,7 +131,7 @@ const Community = () => {
   const [editCategories, setEditCategories] = useState([]);
 
   const fetchPosts = () => {
-    const url = `http://127.0.0.1:5000/api/community${currentUser ? `?user_id=${currentUser.id}` : ''}`;
+    const url = `${API_ENDPOINTS.COMMUNITY}${currentUser ? `?user_id=${currentUser.id}` : ''}`;
     fetch(url)
       .then(res => res.json())
       .then(data => {
@@ -177,7 +178,7 @@ const Community = () => {
     setLikeLoading(postId);
   
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/community/like', {
+      const res = await fetch(API_ENDPOINTS.COMMUNITY_LIKE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include', // important for session
@@ -224,7 +225,7 @@ const Community = () => {
     }));
 
     try {
-        await fetch('http://127.0.0.1:5000/api/community/comment/like', {
+        await fetch(API_ENDPOINTS.COMMUNITY_COMMENT_LIKE, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -242,7 +243,7 @@ const Community = () => {
     if (!content?.trim()) return;
   
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/community/comment', {
+      const res = await fetch(API_ENDPOINTS.COMMUNITY_COMMENT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -272,7 +273,7 @@ const Community = () => {
     if (!newPostContent.trim() || selectedCategories.length === 0) return;
     setPosting(true);
     try {
-      await fetch('http://127.0.0.1:5000/api/community/post', {
+      await fetch(API_ENDPOINTS.COMMUNITY_POST, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -284,7 +285,7 @@ const Community = () => {
       });
 
       // Re-fetch real posts
-      const res = await fetch('http://127.0.0.1:5000/api/community');
+      const res = await fetch(API_ENDPOINTS.COMMUNITY);
       const data = await res.json();
       setAllPosts(data.posts);
       setPosts(data.posts);
@@ -318,7 +319,7 @@ const Community = () => {
       const session = sessionData?.session;
       const token = session?.access_token;
       
-      await fetch(`http://127.0.0.1:5000/api/community/post/${editingPost.id}`, {
+      await fetch(API_ENDPOINTS.COMMUNITY_POST_EDIT(editingPost.id), {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -360,7 +361,7 @@ const Community = () => {
         const session = sessionData?.session;
         const token = session?.access_token;
         
-        await fetch(`http://127.0.0.1:5000/api/community/post/${postId}`, {
+        await fetch(API_ENDPOINTS.COMMUNITY_POST_DELETE(postId), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`

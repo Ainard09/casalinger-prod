@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import PasswordInput from '../components/PasswordInput';
+import { API_ENDPOINTS } from '../utils/config';
 
 const AgentRegister = () => {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ const AgentRegister = () => {
         setMessage('');
         try {
             // Check if agent already exists
-            const checkResponse = await fetch('http://127.0.0.1:5000/api/check-agent-exists', {
+            const checkResponse = await fetch(API_ENDPOINTS.CHECK_AGENT_EXISTS, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
@@ -40,7 +41,7 @@ const AgentRegister = () => {
                 email,
                 password,
                 options: {
-                    emailRedirectTo: 'http://localhost:5173/agent/onboarding'
+                    emailRedirectTo: `${window.location.origin}/agent/onboarding`
                 }
             });
             if (error) {

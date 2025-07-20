@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiStar, FiEye, FiHome, FiUsers, FiSettings, FiLogOut } from 'react-icons/fi';
 import { supabase } from '../utils/supabaseClient';
 import { AuthContext } from '../context/AuthContext';
+import { API_ENDPOINTS } from '../utils/config';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -48,7 +49,7 @@ const AdminDashboard = () => {
             const { data: sessionData } = await supabase.auth.getSession();
             const session = sessionData?.session;
             const token = session?.access_token;
-            const res = await fetch(`http://127.0.0.1:5000/api/admin/properties?${params}`, {
+            const res = await fetch(`${API_ENDPOINTS.ADMIN_PROPERTIES}?${params}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ const AdminDashboard = () => {
             const { data: sessionData } = await supabase.auth.getSession();
             const session = sessionData?.session;
             const token = session?.access_token;
-            const res = await fetch('http://127.0.0.1:5000/api/admin/agents', {
+            const res = await fetch(API_ENDPOINTS.ADMIN_AGENTS, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ const AdminDashboard = () => {
             const session = sessionData?.session;
             const token = session?.access_token;
             const endpoint = currentStatus ? 'unfeature' : 'feature';
-            const res = await fetch(`http://127.0.0.1:5000/api/admin/property/${propertyId}/${endpoint}`, {
+            const res = await fetch(API_ENDPOINTS.ADMIN_PROPERTY_ACTION(propertyId, endpoint), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

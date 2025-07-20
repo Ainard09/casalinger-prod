@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import { API_ENDPOINTS } from '../utils/config';
 
 const COLORS = {
     light: ['#60A5FA', '#34D399', '#FBBF24', '#F87171', '#A78BFA'],
@@ -58,7 +59,7 @@ const AgentAnalytics = () => {
 
     const fetchLocations = async () => {
         try {
-            const res = await fetch(`http://127.0.0.1:5000/api/agent/${currentUser.id}/locations`);
+            const res = await fetch(API_ENDPOINTS.AGENT_LOCATIONS(currentUser.id));
             if (res.ok) {
                 const data = await res.json();
                 setLocations(data);
@@ -73,7 +74,7 @@ const AgentAnalytics = () => {
             setLoading(true);
             const [analyticsRes, trendsRes] = await Promise.all([
                 fetch(
-                    `http://127.0.0.1:5000/api/agent/${currentUser.id}/analytics?${new URLSearchParams({
+                    `${API_ENDPOINTS.AGENT_ANALYTICS(currentUser.id)}?${new URLSearchParams({
                         city: filters.city,
                         area: filters.area,
                         startDate: filters.startDate.toISOString(),
@@ -81,7 +82,7 @@ const AgentAnalytics = () => {
                     })}`
                 ),
                 fetch(
-                    `http://127.0.0.1:5000/api/agent/${currentUser.id}/trends?${new URLSearchParams({
+                    `${API_ENDPOINTS.AGENT_TRENDS(currentUser.id)}?${new URLSearchParams({
                         city: filters.city,
                         area: filters.area,
                         startDate: filters.startDate.toISOString(),
@@ -132,7 +133,7 @@ const AgentAnalytics = () => {
                 startDate: filters.startDate.toISOString(),
                 endDate: filters.endDate.toISOString(),
             });
-            const res = await fetch(`http://127.0.0.1:5000/api/market/analytics?${params.toString()}`);
+            const res = await fetch(`${API_ENDPOINTS.MARKET_ANALYTICS}?${params.toString()}`);
             if (!res.ok) throw new Error('Failed to fetch market data');
             const data = await res.json();
             setMarketData(data);

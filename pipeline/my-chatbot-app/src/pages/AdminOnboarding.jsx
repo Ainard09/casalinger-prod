@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { AuthContext } from '../context/AuthContext';
 import PasswordInput from '../components/PasswordInput';
+import { API_ENDPOINTS } from '../utils/config';
 
 export default function AdminOnboarding() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function AdminOnboarding() {
       const session = sessionData?.session;
       const token = session?.access_token;
       // Send onboarding data to backend
-      const response = await fetch('http://127.0.0.1:5000/api/admin/onboarding', {
+      const response = await fetch(API_ENDPOINTS.ADMIN_ONBOARDING, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -51,7 +52,7 @@ export default function AdminOnboarding() {
       });
       if (response.ok) {
         // Refetch admin profile from backend to get latest onboarding_complete flag
-        const profileRes = await fetch('http://127.0.0.1:5000/api/admin/profile', {
+        const profileRes = await fetch(API_ENDPOINTS.ADMIN_PROFILE, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (profileRes.ok) {

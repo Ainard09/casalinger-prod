@@ -9,6 +9,7 @@ import HeroBanner from '../components/HeroBanner';
 import MegaCarousel from '../components/MegaCarousel';
 import ReelSection from '../components/ReelSection';
 import { useBreakpoint } from '../hooks/useBreakpoint';
+import { API_ENDPOINTS } from '../utils/config';
 
 const REEL_ROTATE_INTERVAL = 5 * 60 * 1000; // 5 minutes
 const REEL_DISPLAY_COUNT = 12;
@@ -40,7 +41,7 @@ const FeaturedProperties = () => {
   const fetchHomepage = () => {
     setLoading(true);
     const locationParam = searchMode && searchLocation ? `&location=${encodeURIComponent(searchLocation)}` : '';
-    axios.get(`http://127.0.0.1:5000/api/featured-properties?page=${page}${locationParam}${currentUser?.id ? `&user_id=${currentUser.id}` : ''}`)
+    axios.get(`${API_ENDPOINTS.FEATURED_PROPERTIES}?page=${page}${locationParam}${currentUser?.id ? `&user_id=${currentUser.id}` : ''}`)
       .then(res => {
         if (res.data.listings) {
           setListings(res.data.listings);
@@ -96,7 +97,7 @@ const FeaturedProperties = () => {
       setSearchLocation(location);
       setPagination({ current: 1, total: 1, hasPrev: false, hasNext: false });
       setPage(1);
-      axios.get(`http://127.0.0.1:5000/api/featured-properties?page=1&location=${encodeURIComponent(location)}${currentUser?.id ? `&user_id=${currentUser.id}` : ''}`)
+      axios.get(`${API_ENDPOINTS.FEATURED_PROPERTIES}?page=1&location=${encodeURIComponent(location)}${currentUser?.id ? `&user_id=${currentUser.id}` : ''}`)
         .then(res => {
           setListings(res.data.listings || []);
           setPagination({
@@ -137,7 +138,7 @@ const FeaturedProperties = () => {
   useEffect(() => {
     let ignore = false;
     if (currentUser?.id && !currentUser.is_agent) {
-      axios.get(`http://127.0.0.1:5000/api/personalized-reels?user_id=${currentUser.id}`)
+      axios.get(`${API_ENDPOINTS.PERSONALIZED_REELS}?user_id=${currentUser.id}`)
         .then(res => res.data.reels || [])
         .then(all => {
           if (ignore) return;
@@ -155,7 +156,7 @@ const FeaturedProperties = () => {
         })
         .catch(() => setDisplayedReels([]));
     } else if (!currentUser) {
-      axios.get('http://127.0.0.1:5000/api/user-reels')
+      axios.get(API_ENDPOINTS.USER_REELS)
         .then(res => res.data.reels || [])
         .then(all => {
           setReels(all);

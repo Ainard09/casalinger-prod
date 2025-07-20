@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
+import { API_ENDPOINTS } from '../utils/config';
 
 export default function AgentOnboarding() {
     const navigate = useNavigate();
@@ -85,7 +86,7 @@ export default function AgentOnboarding() {
                 languages: languages.filter(l => l.trim()),
                 photo_url: photoUrl
             };
-            const response = await fetch('http://127.0.0.1:5000/api/agent/onboarding', {
+            const response = await fetch(API_ENDPOINTS.AGENT_ONBOARDING, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ export default function AgentOnboarding() {
                 return;
             }
             // Onboarding succeeded, now fetch the latest agent profile
-            const profileRes = await fetch('http://127.0.0.1:5000/api/agent/profile', {
+            const profileRes = await fetch(API_ENDPOINTS.AGENT_PROFILE, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

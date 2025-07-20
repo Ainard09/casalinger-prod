@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { BedDouble, Bath, Filter, ChevronDown, Search as SearchIcon, RefreshCcw } from 'lucide-react';
+import { API_ENDPOINTS } from '../utils/config';
 
 const TAG_OPTIONS = [
     "Luxury", "Modern", "Coastal", "Security", "Garden", "Ocean View", "Duplex", "Stable Light",
@@ -49,7 +50,7 @@ const SearchForm = ({ onSearch, onReset }) => {
         };
         const query = new URLSearchParams(queryObj).toString();
         try {
-            const res = await axios.get(`http://127.0.0.1:5000/api/search-properties?${query}`);
+            const res = await axios.get(`${API_ENDPOINTS.SEARCH_PROPERTIES}?${query}`);
             onSearch(res.data.listings);
         } catch (err) {
             console.error("Search error:", err);

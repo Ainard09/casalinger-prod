@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../utils/config';
 
 const PropertyList = () => {
     const [listings, setListings] = useState([]);
 
     useEffect(() => {
-        axios.get('http://127.0.0.1:5000/api/featured-properties')
+        axios.get(API_ENDPOINTS.FEATURED_PROPERTIES)
             .then(res => setListings(res.data.listings))
             .catch(err => console.error('Failed to load listings:', err));
     }, []);

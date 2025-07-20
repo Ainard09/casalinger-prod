@@ -4,6 +4,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { FiUpload, FiTag, FiImage, FiVideo, FiHome, FiPlus, FiTrash2, FiEdit, FiChevronDown, FiChevronUp, FiCopy, FiMapPin, FiClock, FiSave } from 'react-icons/fi';
 import { supabase } from '../utils/supabaseClient';
+import { API_ENDPOINTS } from '../utils/config';
 
 const TAG_OPTIONS = [
     "Luxury", "Modern", "Coastal", "Security", "Garden", "Ocean View",
@@ -49,7 +50,7 @@ const EditListing = () => {
     useEffect(() => {
         const fetchListingData = async () => {
             try {
-                const { data } = await axios.get(`http://127.0.0.1:5000/api/listing/${listingId}`);
+                const { data } = await axios.get(API_ENDPOINTS.GET_LISTING(listingId));
                 setForm({
                     title: data.title || '',
                     description: data.description || '',
@@ -279,7 +280,7 @@ const EditListing = () => {
         }
 
         try {
-            await axios.put(`http://127.0.0.1:5000/api/listing/${listingId}`, payload, {
+            await axios.put(API_ENDPOINTS.UPDATE_LISTING(listingId), payload, {
                 headers: { 'Content-Type': 'application/json' },
             });
             navigate('/agent-dashboard');
