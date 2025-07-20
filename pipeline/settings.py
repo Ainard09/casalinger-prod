@@ -81,12 +81,18 @@ class Settings(BaseSettings):
         """Return CORS origins based on environment"""
         if self.is_production:
             return [
-                "https://yourdomain.com", 
+                self.FRONTEND_URL, 
                 "https://www.yourdomain.com",
                 "https://casalinger.com",
-                "https://www.casalinger.com"
+                "https://www.casalinger.com",
+                "https://casalinger-prod-j25p.vercel.app",  # Your Vercel domain
+                "https://*.vercel.app"  # Allow all Vercel subdomains
             ]
-        return ["http://localhost:5173", "http://127.0.0.1:5173"]
+        return [
+            "http://localhost:5173", 
+            "http://127.0.0.1:5173",
+            "https://casalinger-prod-j25p.vercel.app"  # Allow Vercel in development too
+        ]
     
     @property
     def api_url(self) -> str:
