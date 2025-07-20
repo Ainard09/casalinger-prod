@@ -1,5 +1,5 @@
 // API Configuration
-const rawApiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const rawApiUrl = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? 'https://casalinger-prod.onrender.com' : 'http://127.0.0.1:5000');
 const API_BASE_URL = rawApiUrl.replace(/\/$/, ''); // Remove trailing slash
 const IS_PRODUCTION = import.meta.env.MODE === 'production';
 
@@ -14,6 +14,11 @@ console.log('🔧 Environment Variables:', {
 // Very obvious test - you should see this in console
 console.log('🚀 DEPLOYMENT TEST - If you see this, new code is deployed!');
 console.log('🎯 Current API URL:', API_BASE_URL);
+
+// Additional debugging
+console.log('🔍 All import.meta.env:', import.meta.env);
+console.log('🔍 Raw VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('🔍 Type of VITE_API_URL:', typeof import.meta.env.VITE_API_URL);
 
 // Supabase Configuration
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
