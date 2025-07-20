@@ -11,6 +11,10 @@ console.log('🔧 Environment Variables:', {
   IS_PRODUCTION: IS_PRODUCTION
 });
 
+// Very obvious test - you should see this in console
+console.log('🚀 DEPLOYMENT TEST - If you see this, new code is deployed!');
+console.log('🎯 Current API URL:', API_BASE_URL);
+
 // Supabase Configuration
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
