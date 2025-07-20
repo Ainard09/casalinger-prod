@@ -119,7 +119,7 @@ const Dashboard = () => {
                 {/* Recommended for You Section */}
                 {recommendations.length > 0 && (
                     <section className="mb-10">
-                        <h3 className="text-xl font-semibold mb-4">Recommended for You</h3>
+                        <h3 className="text-xl font-semibold mb-4">Recommended Properties You May Like</h3>
                         <div className="relative">
                             <div
                                 ref={recommendationsRef}

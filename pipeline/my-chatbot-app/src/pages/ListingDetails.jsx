@@ -8,7 +8,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 import { Button } from '../ui/Button';
-import { MapPin, Video, BadgeCheck, PawPrint, Home, Phone, Calendar, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, Video, BadgeCheck, PawPrint, Home, Phone, Calendar, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Map, Heart } from 'lucide-react';
 import { FiHeart, FiShare2, FiMessageSquare, FiPlay, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import PropertyCard from '../components/PropertyCard';
 import Footer from '../components/Footer';
@@ -59,7 +59,8 @@ const ListingDetails = () => {
         moveIn: '',
         message: `I am interested in ${listing?.title || 'this property'}.`,
     });
-    const recommendationsRef = useRef(null);
+    const similarPropertiesRef = useRef(null);
+    const propertiesYouMayLikeRef = useRef(null);
 
     const rentPeriodAbbr = useMemo(() => {
         if (!listing?.rent_period) return '';
@@ -155,9 +156,18 @@ const ListingDetails = () => {
         return { [unitFilter]: listingSummary.byBedroom[unitFilter] || [] };
     };
 
-    const scrollRecommendations = (direction) => {
-        if (recommendationsRef.current) {
-            recommendationsRef.current.scrollBy({
+    const scrollSimilarProperties = (direction) => {
+        if (similarPropertiesRef.current) {
+            similarPropertiesRef.current.scrollBy({
+                left: direction === 'left' ? -350 : 350,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const scrollPropertiesYouMayLike = (direction) => {
+        if (propertiesYouMayLikeRef.current) {
+            propertiesYouMayLikeRef.current.scrollBy({
                 left: direction === 'left' ? -350 : 350,
                 behavior: 'smooth'
             });
@@ -364,7 +374,7 @@ const ListingDetails = () => {
     if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
     if (!listing) return <div className="text-center py-10">Listing not found</div>;
 
-    const { image_paths = [], video_path, recommendations = [], lat, lng } = listing;
+    const { image_paths = [], video_path, similar_properties = [], properties_you_may_like = [], lat, lng } = listing;
     const mediaSlides = [
         ...image_paths.map((img) => ({ type: 'image', src: img })),
         ...(video_path ? [{ type: 'video', src: video_path }] : []),
@@ -855,17 +865,20 @@ const ListingDetails = () => {
                                 </div>
                             </div>
                         )}
-                        {/* Recommended Listings */}
-                        {recommendations && recommendations.length > 0 && (
-                            <div className="mt-12">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Recommended Properties Near You</h2>
+                        {/* Similar Properties Near You */}
+                        {similar_properties && similar_properties.length > 0 && (
+                            <div className="mt-12 p-6 bg-blue-50 rounded-xl border border-blue-100">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                                    <Map className="w-6 h-6 text-blue-600" />
+                                    Similar Properties Near You
+                                </h2>
                                 <div className="relative">
                                     <div
-                                        ref={recommendationsRef}
+                                        ref={similarPropertiesRef}
                                         className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-2 px-1"
                                         style={{ scrollSnapType: 'x mandatory' }}
                                     >
-                                        {(recommendations.slice(0, 10)).map((rec) => (
+                                        {(similar_properties.slice(0, 5)).map((rec) => (
                                             <div key={rec.id} className="flex-shrink-0 w-64 md:w-72 scroll-snap-align-start">
                                                 <div 
                                                     className="cursor-pointer"
@@ -889,13 +902,65 @@ const ListingDetails = () => {
 
                                     {/* Scroll Buttons */}
                                     <button
-                                        onClick={() => scrollRecommendations('left')}
+                                        onClick={() => scrollSimilarProperties('left')}
                                         className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm rounded-full shadow-md p-2 hover:bg-white transition-transform duration-200 hover:scale-110 hidden md:flex"
                                     >
                                         <ChevronLeft className="w-6 h-6 text-gray-700" />
                                     </button>
                                     <button
-                                        onClick={() => scrollRecommendations('right')}
+                                        onClick={() => scrollSimilarProperties('right')}
+                                        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm rounded-full shadow-md p-2 hover:bg-white transition-transform duration-200 hover:scale-110 hidden md:flex"
+                                    >
+                                        <ChevronRight className="w-6 h-6 text-gray-700" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Properties You May Like */}
+                        {properties_you_may_like && properties_you_may_like.length > 0 && (
+                            <div className="mt-12 p-6 bg-red-50 rounded-xl border border-red-100">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                                    <Heart className="w-6 h-6 text-red-500" />
+                                    Properties You May Like
+                                </h2>
+                                <div className="relative">
+                                    <div
+                                        ref={propertiesYouMayLikeRef}
+                                        className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-2 px-1"
+                                        style={{ scrollSnapType: 'x mandatory' }}
+                                    >
+                                        {(properties_you_may_like.slice(0, 5)).map((rec) => (
+                                            <div key={rec.id} className="flex-shrink-0 w-64 md:w-72 scroll-snap-align-start">
+                                                <div 
+                                                    className="cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        console.log('Navigating to:', `/listing/${rec.id}`);
+                                                        navigate(`/listing/${rec.id}`);
+                                                    }}
+                                                >
+                                                    <PropertyCard 
+                                                        property={rec} 
+                                                        savedListings={[]} 
+                                                        toggleSave={() => {}} 
+                                                        hideHeart={true}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Scroll Buttons */}
+                                    <button
+                                        onClick={() => scrollPropertiesYouMayLike('left')}
+                                        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm rounded-full shadow-md p-2 hover:bg-white transition-transform duration-200 hover:scale-110 hidden md:flex"
+                                    >
+                                        <ChevronLeft className="w-6 h-6 text-gray-700" />
+                                    </button>
+                                    <button
+                                        onClick={() => scrollPropertiesYouMayLike('right')}
                                         className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm rounded-full shadow-md p-2 hover:bg-white transition-transform duration-200 hover:scale-110 hidden md:flex"
                                     >
                                         <ChevronRight className="w-6 h-6 text-gray-700" />
