@@ -20,6 +20,19 @@ console.log('🔍 All import.meta.env:', import.meta.env);
 console.log('🔍 Raw VITE_API_URL:', import.meta.env.VITE_API_URL);
 console.log('🔍 Type of VITE_API_URL:', typeof import.meta.env.VITE_API_URL);
 
+// Test API connectivity
+fetch(`${API_BASE_URL}/api/featured-properties?page=1`)
+  .then(response => {
+    console.log('✅ API Test Success:', response.status, response.statusText);
+    return response.json();
+  })
+  .then(data => {
+    console.log('✅ API Data Received:', data);
+  })
+  .catch(error => {
+    console.error('❌ API Test Failed:', error);
+  });
+
 // Supabase Configuration
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;

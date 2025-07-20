@@ -7,8 +7,14 @@ import 'swiper/css';
 import 'swiper/css/autoplay';
 import 'swiper/css/pagination';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <AuthProvider>
+console.log('🚀 main.jsx is loading...');
+console.log('🔍 Root element:', document.getElementById('root'));
+
+try {
+  ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
-  </AuthProvider>
-);
+  );
+  console.log('✅ React app rendered successfully');
+} catch (error) {
+  console.error('❌ Error rendering React app:', error);
+}
