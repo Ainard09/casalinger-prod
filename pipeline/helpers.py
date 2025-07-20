@@ -2,45 +2,51 @@ import pandas as pd
 import numpy as np
 import sqlite3
 from scipy.sparse import csr_matrix
+from supabase_models import db, Interaction, Listing
 
 
-def load_datasets(filepath):
+def load_datasets(filepath=None):
     """
-    INPUT:
-    filepath - (str) the path to the SQLite database
-    
     OUTPUT:
     df - (pandas dataframe) a DataFrame with processed interactions
-    
     Description:
-    Reads the interactions table and maps interaction types to numerical values.
+    Reads the interactions table from Supabase/Postgres and maps interaction types to numerical values.
     """
-    # Connect to the SQLite database
-    conn = sqlite3.connect(filepath)
-    # Read the 'interaction' table into a DataFrame
-    df = pd.read_sql_query("SELECT * FROM interactions", conn)
-    conn.close()
-    
-    # Keep relevant columns
-    df = df[["user_id", "listing_id", "interaction_type"]]
-    
+    # Query all interactions from the database
+    interactions = Interaction.query.all()
+    # Convert to DataFrame
+    df = pd.DataFrame([
+        {
+            "user_id": i.user_id,
+            "listing_id": i.listing_id,
+            "interaction_type": i.interaction_type
+        }
+        for i in interactions
+    ])
     # Map interaction types to numeric values
     interaction_mapping = {
-        "viewed": 1,
+        "view": 1,
         "saved": 2
     }
-    df["interaction_type"] = df["interaction_type"].map(interaction_mapping)
-    
+    if not df.empty:
+        df["interaction_type"] = df["interaction_type"].map(interaction_mapping)
     return df
 
-def load_listing_data(filepath):
-    # Connect to the SQLite database
-    conn = sqlite3.connect(filepath)
-    # Read the 'interaction' table into a DataFrame
-    df = pd.read_sql_query("SELECT * FROM listings", conn)
-    conn.close()
-
-    df = df[["id", "bedrooms", "bathrooms", "price", "area", "city", "state"]]
+def load_listing_data(filepath=None):
+    # Query all listings from the database
+    listings = Listing.query.all()
+    df = pd.DataFrame([
+        {
+            "id": l.id,
+            "bedrooms": l.bedrooms,
+            "bathrooms": l.bathrooms,
+            "price": l.price,
+            "area": l.area,
+            "city": l.city,
+            "state": l.state
+        }
+        for l in listings
+    ])
     return df
 
 

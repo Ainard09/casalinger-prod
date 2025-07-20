@@ -6,11 +6,11 @@ Your app was hitting the 512MB memory limit on Render's free tier. Here's how to
 
 ## 1. Use Optimized Requirements
 
-**Use `requirements-prod.txt` instead of `requirements.txt`** for production:
+**Use requirements.txt`** for production:
 
 ```bash
 # In Render Build Command:
-pip install -r requirements-prod.txt
+pip install -r requirements.txt
 ```
 
 This excludes heavy ML dependencies that load on startup.

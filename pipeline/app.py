@@ -1248,49 +1248,166 @@ def create_app():
             tags = []
 
         # === RECOMMENDATIONS ===
-        recommendations_query = Listing.query.filter(
-            Listing.id != listing.id,
-            Listing.city == listing.city
-        ).order_by(Listing.id.desc()).limit(4)
-
-        recommendations = []
-        for rec in recommendations_query:
+        # Initialize recommendation lists
+        similar_properties = []
+        properties_you_may_like = []
+        
+        # Get content-based recommendations (similar properties near you)
+        try:
+            recommender = Recommender(user_id=user_id if user_id else 1)  # Use dummy user_id if not logged in
+            content_based_recs = recommender.content_based(listing_id)
+            
+            # Format content-based recommendations
+            for rec in content_based_recs:
+                try:
+                    rec_images = json.loads(rec.image_paths) if rec.image_paths else []
+                except json.JSONDecodeError:
+                    rec_images = []
+                rec_images = [to_supabase_url(img, 'listings') for img in rec_images if img]
+                
+                # Get units data for complex listings
+                units_data = []
+                if rec.listing_type == 'complex':
+                    units = Unit.query.filter_by(listing_id=rec.id).all()
+                    units_data = [
+                        {
+                            "id": unit.id,
+                            "name": unit.name,
+                            "bedrooms": unit.bedrooms,
+                            "bathrooms": unit.bathrooms,
+                            "sqft": unit.sqft,
+                            "price_min": unit.price_min,
+                            "price_max": unit.price_max,
+                            "is_available": unit.is_available
+                        }
+                        for unit in units
+                    ]
+                
+                similar_properties.append({
+                    "id": rec.id,
+                    "title": rec.title,
+                    "price": rec.price,
+                    "city": rec.city,
+                    "state": rec.state,
+                    "area": rec.area,
+                    "bedrooms": rec.bedrooms,
+                    "bathrooms": rec.bathrooms,
+                    "image_paths": rec_images,
+                    "listing_type": rec.listing_type,
+                    "rent_period": rec.rent_period,
+                    "units": units_data
+                })
+        except Exception as e:
+            print(f"Error getting content-based recommendations: {e}")
+            # Fallback to simple city-based recommendations
+            fallback_recs = Listing.query.filter(
+                Listing.id != listing.id,
+                Listing.city == listing.city
+            ).order_by(Listing.id.desc()).limit(4).all()
+            
+            for rec in fallback_recs:
+                try:
+                    rec_images = json.loads(rec.image_paths) if rec.image_paths else []
+                except json.JSONDecodeError:
+                    rec_images = []
+                rec_images = [to_supabase_url(img, 'listings') for img in rec_images if img]
+                
+                units_data = []
+                if rec.listing_type == 'complex':
+                    units = Unit.query.filter_by(listing_id=rec.id).all()
+                    units_data = [
+                        {
+                            "id": unit.id,
+                            "name": unit.name,
+                            "bedrooms": unit.bedrooms,
+                            "bathrooms": unit.bathrooms,
+                            "sqft": unit.sqft,
+                            "price_min": unit.price_min,
+                            "price_max": unit.price_max,
+                            "is_available": unit.is_available
+                        }
+                        for unit in units
+                    ]
+                
+                similar_properties.append({
+                    "id": rec.id,
+                    "title": rec.title,
+                    "price": rec.price,
+                    "city": rec.city,
+                    "state": rec.state,
+                    "area": rec.area,
+                    "bedrooms": rec.bedrooms,
+                    "bathrooms": rec.bathrooms,
+                    "image_paths": rec_images,
+                    "listing_type": rec.listing_type,
+                    "rent_period": rec.rent_period,
+                    "units": units_data
+                })
+        
+        # Get user-based recommendations (properties you may like) - only if user is logged in
+        if user_id:
             try:
-                rec_images = json.loads(rec.image_paths) if rec.image_paths else []
-            except json.JSONDecodeError:
-                rec_images = []
-            rec_images = [to_supabase_url(img, 'listings') for img in rec_images if img]
-            # Get units data for complex listings
-            units_data = []
-            if rec.listing_type == 'complex':
-                units = Unit.query.filter_by(listing_id=rec.id).all()
-                units_data = [
-                    {
-                        "id": unit.id,
-                        "name": unit.name,
-                        "bedrooms": unit.bedrooms,
-                        "bathrooms": unit.bathrooms,
-                        "sqft": unit.sqft,
-                        "price_min": unit.price_min,
-                        "price_max": unit.price_max,
-                        "is_available": unit.is_available
-                    }
-                    for unit in units
-                ]
-            recommendations.append({
-                "id": rec.id,
-                "title": rec.title,
-                "price": rec.price,
-                "city": rec.city,
-                "state": rec.state,
-                "area": rec.area,
-                "bedrooms": rec.bedrooms,
-                "bathrooms": rec.bathrooms,
-                "image_paths": rec_images,
-                "listing_type": rec.listing_type,
-                "rent_period": rec.rent_period,
-                "units": units_data
-            })
+                # Get user interactions to determine recommendation type
+                interactions = Interaction.query.filter_by(user_id=user_id).all()
+                
+                if not interactions:
+                    # If no interactions, use rank-based recommendations
+                    user_recs = recommender.rank_based()
+                else:
+                    # Use user-based collaborative filtering
+                    user_recs = recommender.user_rec()
+                
+                # Get IDs of content-based recommendations to avoid duplicates
+                content_based_ids = {rec["id"] for rec in similar_properties}
+                
+                # Format user-based recommendations and filter out duplicates
+                for rec in user_recs:
+                    if rec.id not in content_based_ids:  # Ensure no overlap
+                        try:
+                            rec_images = json.loads(rec.image_paths) if rec.image_paths else []
+                        except json.JSONDecodeError:
+                            rec_images = []
+                        rec_images = [to_supabase_url(img, 'listings') for img in rec_images if img]
+                        
+                        # Get units data for complex listings
+                        units_data = []
+                        if rec.listing_type == 'complex':
+                            units = Unit.query.filter_by(listing_id=rec.id).all()
+                            units_data = [
+                                {
+                                    "id": unit.id,
+                                    "name": unit.name,
+                                    "bedrooms": unit.bedrooms,
+                                    "bathrooms": unit.bathrooms,
+                                    "sqft": unit.sqft,
+                                    "price_min": unit.price_min,
+                                    "price_max": unit.price_max,
+                                    "is_available": unit.is_available
+                                }
+                                for unit in units
+                            ]
+                        
+                        properties_you_may_like.append({
+                            "id": rec.id,
+                            "title": rec.title,
+                            "price": rec.price,
+                            "city": rec.city,
+                            "state": rec.state,
+                            "area": rec.area,
+                            "bedrooms": rec.bedrooms,
+                            "bathrooms": rec.bathrooms,
+                            "image_paths": rec_images,
+                            "listing_type": rec.listing_type,
+                            "rent_period": rec.rent_period,
+                            "units": units_data
+                        })
+                        
+                        # Limit to 4 recommendations
+                        if len(properties_you_may_like) >= 5:
+                            break
+                            
+            except Exception as e:
+                print(f"Error getting user-based recommendations: {e}")
 
         # === Agent Info ===
         agent_info = None
@@ -1338,7 +1455,8 @@ def create_app():
             "image_paths": images,
             "video_path": video_path,
             "tags": tags,
-            "recommendations": recommendations,
+            "similar_properties": similar_properties,
+            "properties_you_may_like": properties_you_may_like,
             "listing_type": listing.listing_type,
             "rent_period": listing.rent_period,
             "units": units_data,
@@ -1370,7 +1488,7 @@ def create_app():
         saved_listings = user.saved_listings
 
         interactions = Interaction.query.filter_by(user_id=user_id).all()
-        recommender = Recommender(user_id=user_id, data=filepath)
+        recommender = Recommender(user_id=user_id)
 
         if not interactions:
             recommendations = recommender.rank_based()
@@ -1435,9 +1553,10 @@ def create_app():
                 "units": units_data
             })
 
-        # Recommended listings (now ORM-based)
-        recommender = Recommender(user_id=user_id)
+        # Recommended listings
         interactions = Interaction.query.filter_by(user_id=user_id).all()
+        recommender = Recommender(user_id=user_id)
+
         if not interactions:
             recommended = recommender.rank_based()
         else:
