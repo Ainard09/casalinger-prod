@@ -84,7 +84,7 @@ class Recommender():
         Returns:
         - List of recommended listing objects.
         """
-        feature_columns = ["bedrooms", "bathrooms", "price"]  # Features to compare
+        feature_columns = ["bedrooms", "bathrooms", "price"]
         content_features = self.listing_data[feature_columns]
 
         # Normalize the feature values
@@ -106,19 +106,40 @@ class Recommender():
         current_area = current_listing['area']
         current_city = current_listing['city']
 
-        # Split similar listings into prioritized groups
+        # Get all similar listings
         similar_listings = self.listing_data.iloc[similar_indices]
-        area_listings = similar_listings[similar_listings['area'] == current_area]
-        city_listings = similar_listings[(similar_listings['city'] == current_city) & (similar_listings['area'] != current_area)]
-        other_listings = similar_listings[(similar_listings['city'] != current_city)]
+        
+        # Add priority column for sorting
+        def get_priority(row):
+            if row['area'] == current_area:
+                return 1  # Highest priority
+            elif row['city'] == current_city:
+                return 2  # Medium priority
+            else:
+                return 3  # Lowest priority
+        
+        similar_listings = similar_listings.copy()
+        similar_listings['priority'] = similar_listings.apply(get_priority, axis=1)
+        
+        # Sort by priority first, then by original similarity order
+        similar_listings = similar_listings.sort_values(['priority', 'id'])
+        
+        # Get unique IDs in order
+        recommended_ids = []
+        seen_ids = set()
+        
+        for _, listing in similar_listings.iterrows():
+            if listing['id'] not in seen_ids:
+                recommended_ids.append(listing['id'])
+                seen_ids.add(listing['id'])
+                if len(recommended_ids) >= self.rec_num:
+                    break
 
-        # Combine prioritized groups
-        final_recommendations = pd.concat([area_listings, city_listings, other_listings])
-
-        # Limit the recommendations to the top rec_num listings
-        recommended_ids = final_recommendations['id'].tolist()[:self.rec_num]
-
-        # Fetch the listings from the database
-        recommended_listings = Listing.query.filter(Listing.id.in_(recommended_ids)).all()
+        # Fetch the listings from the database in the correct order
+        recommended_listings = []
+        for listing_id in recommended_ids:
+            listing = Listing.query.get(listing_id)
+            if listing:
+                recommended_listings.append(listing)
 
         return recommended_listings
