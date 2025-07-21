@@ -109,31 +109,38 @@ class Recommender():
         # Get all similar listings
         similar_listings = self.listing_data.iloc[similar_indices]
         
-        # Add priority column for sorting
-        def get_priority(row):
-            if row['area'] == current_area:
-                return 1  # Highest priority
-            elif row['city'] == current_city:
-                return 2  # Medium priority
-            else:
-                return 3  # Lowest priority
-        
-        similar_listings = similar_listings.copy()
-        similar_listings['priority'] = similar_listings.apply(get_priority, axis=1)
-        
-        # Sort by priority first, then by original similarity order
-        similar_listings = similar_listings.sort_values(['priority', 'id'])
-        
-        # Get unique IDs in order
+        # Create priority groups with explicit ordering
         recommended_ids = []
         seen_ids = set()
         
-        for _, listing in similar_listings.iterrows():
+        # 1. First priority: Same area (maintain original similarity order)
+        area_listings = similar_listings[similar_listings['area'] == current_area]
+        for _, listing in area_listings.iterrows():
             if listing['id'] not in seen_ids:
                 recommended_ids.append(listing['id'])
                 seen_ids.add(listing['id'])
                 if len(recommended_ids) >= self.rec_num:
                     break
+        
+        # 2. Second priority: Same city, different area (maintain original similarity order)
+        if len(recommended_ids) < self.rec_num:
+            city_listings = similar_listings[(similar_listings['city'] == current_city) & (similar_listings['area'] != current_area)]
+            for _, listing in city_listings.iterrows():
+                if listing['id'] not in seen_ids:
+                    recommended_ids.append(listing['id'])
+                    seen_ids.add(listing['id'])
+                    if len(recommended_ids) >= self.rec_num:
+                        break
+        
+        # 3. Third priority: Other cities (maintain original similarity order)
+        if len(recommended_ids) < self.rec_num:
+            other_listings = similar_listings[similar_listings['city'] != current_city]
+            for _, listing in other_listings.iterrows():
+                if listing['id'] not in seen_ids:
+                    recommended_ids.append(listing['id'])
+                    seen_ids.add(listing['id'])
+                    if len(recommended_ids) >= self.rec_num:
+                        break
 
         # Fetch the listings from the database in the correct order
         recommended_listings = []
