@@ -2279,14 +2279,23 @@ def create_app():
                 area = listing.area
                 area_demand[area] = area_demand.get(area, 0) + 1
 
-            # Bedroom demand
+            # Bedroom demand (now includes units for complex listings)
             bedroom_demand = {}
             for inter in interactions:
                 listing = Listing.query.get(inter.listing_id)
-                if not listing or not listing.bedrooms:
+                if not listing:
                     continue
-                bedrooms = str(listing.bedrooms)
-                bedroom_demand[bedrooms] = bedroom_demand.get(bedrooms, 0) + 1
+                if getattr(listing, 'listing_type', None) == 'complex':
+                    from supabase_models import Unit
+                    units = Unit.query.filter_by(listing_id=listing.id).all()
+                    for unit in units:
+                        if unit.bedrooms:
+                            bedrooms = str(unit.bedrooms)
+                            bedroom_demand[bedrooms] = bedroom_demand.get(bedrooms, 0) + 1
+                else:
+                    if listing.bedrooms:
+                        bedrooms = str(listing.bedrooms)
+                        bedroom_demand[bedrooms] = bedroom_demand.get(bedrooms, 0) + 1
 
             return jsonify({
                 'tag_trends': sorted_tag_trends,
@@ -2737,16 +2746,22 @@ def create_app():
                 areas_result = [{'name': area, 'demand': demand} for area, demand in areas_sorted]
                 cities_result.append({'name': city, 'demand': data['demand'], 'areas': areas_result})
 
-            # Bedroom demand
+            # Bedroom demand (now includes units for complex listings)
             bedroom_counter = {}
             for inter in interactions:
                 listing = Listing.query.get(inter.listing_id)
                 if not listing:
                     continue
-                bedrooms = str(listing.bedrooms) if listing.bedrooms else 'Unknown'
-                if bedrooms not in bedroom_counter:
-                    bedroom_counter[bedrooms] = 0
-                bedroom_counter[bedrooms] += 1
+                if getattr(listing, 'listing_type', None) == 'complex':
+                    from supabase_models import Unit
+                    units = Unit.query.filter_by(listing_id=listing.id).all()
+                    for unit in units:
+                        if unit.bedrooms:
+                            bedrooms = str(unit.bedrooms)
+                            bedroom_counter[bedrooms] = bedroom_counter.get(bedrooms, 0) + 1
+                else:
+                    bedrooms = str(listing.bedrooms) if listing.bedrooms else 'Unknown'
+                    bedroom_counter[bedrooms] = bedroom_counter.get(bedrooms, 0) + 1
             top_bedrooms = sorted(bedroom_counter.items(), key=lambda x: x[1], reverse=True)[:10]
             bedrooms_result = [{'name': name, 'demand': demand} for name, demand in top_bedrooms]
 
@@ -2793,7 +2808,7 @@ def create_app():
     def pause_promotion(listing_id):
         try:
             listing = Listing.query.get_or_404(listing_id)
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)  # Use timezone-aware datetime
             
             # Only pause if currently promoted and promotion hasn't expired
             if listing.is_promoted and listing.promoted_until and listing.promoted_until > now:
@@ -2830,7 +2845,7 @@ def create_app():
     def resume_promotion(listing_id):
         try:
             listing = Listing.query.get_or_404(listing_id)
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)  # Use timezone-aware datetime
             
             # Check if there are remaining days from a previous pause
             if listing.remaining_days and listing.remaining_days > 0:
