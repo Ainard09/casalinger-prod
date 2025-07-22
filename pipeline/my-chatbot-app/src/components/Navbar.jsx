@@ -81,7 +81,7 @@ const Navbar = () => {
                 {/* Logo centered */}
                 <Link to="/" className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
                     <img
-                        src="/CasaLinger logo.jpg"
+                        src="/CasaLinger logo.png"
                         alt="CasaLinger"
                         className="h-12 w-auto"
                     />
@@ -183,7 +183,7 @@ const Navbar = () => {
                 {/* Logo */}
                 <Link to="/" className="flex items-center">
                     <img
-                        src="/CasaLinger logo.jpg"
+                        src="/CasaLinger logo.png"
                         alt="CasaLinger"
                         className="h-14 w-auto"
                     />
