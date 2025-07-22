@@ -83,7 +83,7 @@ const Navbar = () => {
                     <img
                         src="/CasaLinger logo.png"
                         alt="CasaLinger"
-                        className="h-12 w-auto"
+                        className="h-8 max-h-8 w-auto md:h-10 md:max-h-10 transition-all duration-200"
                     />
                 </Link>
                 {/* Profile icon at far right, first letter only, with dropdown */}
@@ -185,7 +185,7 @@ const Navbar = () => {
                     <img
                         src="/CasaLinger logo.png"
                         alt="CasaLinger"
-                        className="h-14 w-auto"
+                        className="h-10 max-h-10 w-auto transition-all duration-200"
                     />
                 </Link>
                 {/* Desktop navigation links */}
