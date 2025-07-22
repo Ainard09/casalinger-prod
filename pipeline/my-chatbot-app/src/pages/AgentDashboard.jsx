@@ -653,7 +653,7 @@ const AgentDashboard = () => {
                                                     </button>
                                                 </div>
                                                 <div className="text-xs text-gray-600">
-                                                    {listing.remaining_days.toFixed(1)} days remaining
+                                                    {Math.round(listing.remaining_days)} days remaining
                                                 </div>
                                                 {listing.paused_at && (
                                                     <div className="text-xs text-gray-500">
