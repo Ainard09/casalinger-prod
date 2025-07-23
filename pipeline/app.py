@@ -84,7 +84,6 @@ def create_app():
     CORS(app, supports_credentials=True, resources={r"/*": {"origins": settings.cors_origins}})
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
     app.config['SESSION_COOKIE_SECURE'] = True  # Set to True in production with HTTPS
     app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -96,12 +95,9 @@ def create_app():
     # Initialize SQLAlchemy
     db.init_app(app)
 
-    # Ensure upload folder exists
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
     # Do NOT run db.create_all() in production with Supabase
-    # with app.app_context():
-    #     db.create_all()
+    with app.app_context():
+        db.create_all()
 
     mimetypes.add_type('video/mp4', '.mp4')
     mimetypes.add_type('video/quicktime', '.mov')  
@@ -3918,5 +3914,5 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(func=expire_promotions, trigger="interval", minutes=30)
 scheduler.start()
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
