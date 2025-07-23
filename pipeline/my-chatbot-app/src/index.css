@@ -6,15 +6,17 @@
   font-family: 'Urbanist', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  /* color: rgba(255, 255, 255, 0.87); */
-  /* background-color: #242424; */
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: 'Urbanist', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 a {
@@ -76,6 +78,7 @@ button:focus-visible {
 }
 
 @keyframes gradient-x {
+
   0%,
   100% {
     background-position: left;
@@ -110,10 +113,13 @@ button:focus-visible {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .reelcard-fullscreen {
@@ -122,6 +128,7 @@ button:focus-visible {
   object-fit: contain !important;
   background: black;
   position: fixed !important;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   z-index: 9999;
 }

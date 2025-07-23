@@ -32,6 +32,7 @@ import AdminOnboarding from './pages/AdminOnboarding';
 import ResetPassword from './pages/ResetPassword';
 import { useContext, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import useAutoDarkMode from './hooks/useAutoDarkMode';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -55,8 +56,8 @@ class ErrorBoundary extends React.Component {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
             <p className="text-gray-600 mb-4">The app encountered an error and couldn't load properly.</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
               Reload Page
@@ -95,6 +96,8 @@ const Logout = () => {
 function AppWithAuth() {
   const { currentUser } = useContext(AuthContext);
   const showChatbot = currentUser && !currentUser.is_agent;
+
+  useAutoDarkMode();
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans">
@@ -268,7 +271,7 @@ function AppWithAuth() {
 
 function App() {
   console.log('🚀 App component is loading...');
-  
+
   return (
     <ErrorBoundary>
       <AuthProvider>
