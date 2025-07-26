@@ -59,20 +59,6 @@ class Recommender():
 
         return recommended_listings
 
-
-    # def content_based(self, listing_id):
-    #     # Get saved listings for the user
-    #     saved_listings = get_user_listings(self.user_id, self.user_item_mat)
-
-    #     # Get similar listings using content-based filtering
-    #     similar_listings = find_similar_listings(listing_id, self.data)
-
-    #     # Exclude saved listings
-    #     filtered_similar_listings = [listing for listing in similar_listings if listing not in saved_listings]
-    #     # Fetch the listings from the database
-    #     filtered_similar_listings = Listing.query.filter(Listing.id.in_(filtered_similar_listings)).all()
-
-    #     return filtered_similar_listings[:self.rec_num]
     
     def content_based(self, listing_id):
         """
@@ -141,12 +127,15 @@ class Recommender():
                     seen_ids.add(listing['id'])
                     if len(recommended_ids) >= self.rec_num:
                         break
+        
+        # exclude saved listings
+        saved_listings = get_user_listings(self.user_id, self.user_item_mat)
 
         # Fetch the listings from the database in the correct order
         recommended_listings = []
         for listing_id in recommended_ids:
-            listing = Listing.query.get(listing_id)
-            if listing:
-                recommended_listings.append(listing)
-
+            if listing_id not in saved_listings:  #skip saved listings
+                listing = Listing.query.get(listing_id)
+                if listing:
+                    recommended_listings.append(listing)
         return recommended_listings
