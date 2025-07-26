@@ -96,8 +96,8 @@ def create_app():
     db.init_app(app)
 
     # Do NOT run db.create_all() in production with Supabase
-    with app.app_context():
-        db.create_all()
+    # with app.app_context():
+    #     db.create_all()
 
     mimetypes.add_type('video/mp4', '.mp4')
     mimetypes.add_type('video/quicktime', '.mov')  
@@ -3914,5 +3914,5 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(func=expire_promotions, trigger="interval", minutes=30)
 scheduler.start()
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
